@@ -8,7 +8,7 @@ Copilot Studio agents.
 - Runtime: **Python 3.14**
 - HTTP: **FastAPI** (OpenAPI 3.1 auto-generated)
 - Validation: **Pydantic v2** (via SQLModel)
-- DB (relational): **PostgreSQL** via `sqlmodel` + `sqlalchemy`
+- DB (relational): **SQLite** via `sqlmodel` + `sqlalchemy`
 - DB (graph): **FalkorDB** via `falkordb` Python client
 - Server: **uvicorn**
 - Tests: `pytest`

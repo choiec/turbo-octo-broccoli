@@ -19,7 +19,7 @@ Canonical text for always-applied rules (§C, §I, §O, §W) is here;
 - **Name**: learner-portfolio
 - **Runtime**: Python 3.14
 - **Stack**: FastAPI (HTTP), Pydantic v2 / SQLModel (validation),
-  PostgreSQL (relational), Neo4j (graph)
+  SQLite (relational), FalkorDB (graph)
 - **Entry**: `main.py`
 - **Type checker**: `ty`; **linter / formatter**: `ruff`
 - **Consumers**: Copilot Studio agents via HTTP
@@ -31,8 +31,8 @@ Canonical text for always-applied rules (§C, §I, §O, §W) is here;
 - **Max depth**: 5 components from root (root not counted).
 - **Naming**: `snake_case` only — lowercase letters and underscores;
   no hyphens, no camelCase in file or directory names.
-- **Core files**: named after the technology they wrap (`postgres.py`,
-  `neo4j.py`, `config.py`).
+- **Core files**: named after the technology they wrap (`sqlite.py`,
+  `falkordb.py`, `config.py`).
 - **Router and model files**: singular domain noun (`grammar.py`,
   `practice.py`); no abbreviations.
 - **Exceptions**: `.git`, `.cursor`, `.venv`, `__pycache__`,
@@ -50,9 +50,9 @@ Canonical text for always-applied rules (§C, §I, §O, §W) is here;
 ## 3. Run, build, test
 
 - **Install**: `uv sync`
-- **Dev server**: `uvicorn main:app --reload` (PostgreSQL + Neo4j
-  required)
-- **Test**: `pytest`; storage tests require `DATABASE_URL` and `NEO4J_*`
+- **Dev server**: `uvicorn main:app --reload` (SQLite embedded;
+  FalkorDB required if using graph features)
+- **Test**: `pytest`; storage tests require `SQLITE_PATH` and `FALKORDB_*`
   env vars set.
 - **Lint / format**: `ruff check .` / `ruff format .`
 - **Type check**: `ty check`; run before considering any task complete.
