@@ -1,4 +1,4 @@
-"""Testlet exam text graph: Source, Testlet, ExamQuestion nodes and edges."""
+"""KICE exam text graph: Source, Testlet, ExamQuestion nodes and edges."""
 
 from __future__ import annotations
 
