@@ -3,11 +3,13 @@ services:
     build: .
     ports:
       - "54321:54321"
-    env_file:
-      - .env
     environment:
       SQLITE_PATH: /data/learner_portfolio.db
       KUZU_PATH: /data/knowledge_graph
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ENTRA_TENANT_ID: ${ENTRA_TENANT_ID:-}
+      ENTRA_CLIENT_ID: ${ENTRA_CLIENT_ID:-}
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_PERSONAL_ACCESS_TOKEN:-}
     volumes:
       - app_data:/data
 
