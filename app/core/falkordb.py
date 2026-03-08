@@ -18,8 +18,8 @@ class GraphDbUnavailableError(RuntimeError):
 
 _INDEX_QUERIES = [
     "CREATE INDEX FOR (n:CefrLevel) ON (n.code)",
-    "CREATE INDEX FOR (n:GrammarItem) ON (n.guideword)",
-    "CREATE INDEX FOR (n:LexicalItem) ON (n.headword)",
+    "CREATE INDEX FOR (n:GrammarProfile) ON (n.guideword)",
+    "CREATE INDEX FOR (n:LexisProfile) ON (n.headword)",
     "CREATE INDEX FOR (n:Source) ON (n.source_id)",
     "CREATE INDEX FOR (n:Testlet) ON (n.testlet_id)",
     "CREATE INDEX FOR (n:ExamQuestion) ON (n.question_id)",

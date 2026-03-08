@@ -4,7 +4,7 @@ import falkordb
 from pydantic import BaseModel
 
 
-class LexicalItem(BaseModel):
+class LexisProfile(BaseModel):
     headword: str
     pos: str | None
     synset_id: str | None
@@ -12,16 +12,16 @@ class LexicalItem(BaseModel):
 
 
 _QUERY = (
-    "MATCH (l:LexicalItem)-[:LEXICAL_LEVEL]->(c:CefrLevel {code: $cefr}) "
+    "MATCH (l:LexisProfile)-[:LEXICAL_LEVEL]->(c:CefrLevel {code: $cefr}) "
     "RETURN l.headword AS headword, l.pos AS pos, l.synset_id AS synset_id,"
     " l.ngsl_rank AS ngsl_rank"
 )
 
 
-def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[LexicalItem]:
+def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[LexisProfile]:
     result = graph.query(_QUERY, params={"cefr": cefr.upper()})
     return [
-        LexicalItem(
+        LexisProfile(
             headword=row[0],
             pos=row[1],
             synset_id=row[2],
