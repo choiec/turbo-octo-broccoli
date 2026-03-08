@@ -21,4 +21,3 @@ ENV API_PORT=54321
 EXPOSE 54321
 ENV PYTHONUNBUFFERED=1
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["sh", "-c", "uv run uvicorn main:app --host 0.0.0.0 --port ${API_PORT}"]
