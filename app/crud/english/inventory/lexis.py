@@ -23,5 +23,7 @@ def list_by_cefr(conn: kuzu.Connection, cefr: str) -> list[LexisItem]:
     items: list[LexisItem] = []
     while result.has_next():
         r = result.get_next()
-        items.append(LexisItem(lemma=r[0], pos=r[1], synset_id=r[2], ngsl_rank=r[3]))
+        items.append(
+            LexisItem(lemma=r[0], pos=r[1], synset_id=r[2], ngsl_rank=r[3])
+        )
     return items
