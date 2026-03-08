@@ -7,17 +7,10 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.135.1",
     "kuzu>=0.11.3",
-    "openai>=2.26.0",
     "pydantic-settings>=2.13.1",
     "python-jose[cryptography]>=3.5.0",
-    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
-    "spacy>=3.8.11",
     "sqlmodel>=0.0.37",
     "uvicorn>=0.41.0",
-    "pymupdf>=1.27.1",
-    "hwp-hwpx-parser>=1.0.0",
-    "miniaudio>=1.61",
-    "vosk>=0.3.45",
 ]
 
 [tool.ruff]
@@ -34,8 +27,16 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+    "hwp-hwpx-parser>=1.0.0",
     "httpx>=0.28.1",
+    "miniaudio>=1.61",
+    "openai>=2.26.0",
+    "pymupdf>=1.27.1",
+    "python-dotenv>=1.0.0",
     "pytest>=9.0.2",
     "ruff>=0.15.5",
+    "spacy>=3.8.11",
     "ty>=0.0.21",
+    "vosk>=0.3.45",
 ]
