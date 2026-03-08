@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -9,7 +10,7 @@ from fastapi.responses import JSONResponse
 from sqlmodel import SQLModel
 
 from app.core.config import settings
-from app.core.falkordb import GraphDbUnavailableError
+from app.core.falkordb import GraphDbUnavailableError, init_graph_schema
 from app.core.sqlite import engine
 from app.routers import english
 
@@ -18,6 +19,10 @@ from app.routers import english
 async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     Path(settings.sqlite_path).parent.mkdir(parents=True, exist_ok=True)
     SQLModel.metadata.create_all(engine)
+    try:
+        init_graph_schema()
+    except GraphDbUnavailableError as e:
+        logging.warning("FalkorDB unavailable at startup: %s", e)
     yield
 
 
