@@ -5,8 +5,12 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import falkordb
+
+if TYPE_CHECKING:
+    from openai import OpenAI
 
 _ROOT = Path(__file__).resolve().parent.parent.parent
 _GRAMMAR_DIR = _ROOT / "temp" / "data" / "english"
@@ -60,7 +64,7 @@ def _build_user_message(
     return "\n".join(lines)
 
 
-def _call_llm(client: object, user_content: str) -> list[str]:
+def _call_llm(client: OpenAI, user_content: str) -> list[str]:
     resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -85,7 +89,7 @@ def _tag_one_testlet(
     testlet_id: str,
     text: str,
     index: dict[str, list[dict]],
-    client: object,
+    client: OpenAI,
     *,
     dry_run: bool = False,
 ) -> int:
