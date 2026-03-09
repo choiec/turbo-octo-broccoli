@@ -39,4 +39,4 @@ scripts/
 tests/scripts/
 
 # DB files (SQLite, Kùzu)
-data/
+# data/

@@ -1,0 +1,25 @@
+# Classification schemes (not source/domain types).
+
+[[object_type]]
+id = "cefr"
+name = "Common European Framework of Reference"
+
+[[object_type]]
+id = "bloom"
+name = "Bloom's taxonomy"
+
+[[object_type]]
+id = "doctype"
+name = "Document type"
+
+[[object_type]]
+id = "isced"
+name = "ISCED education level"
+
+[[object_type]]
+id = "actfl"
+name = "ACTFL proficiency"
+
+[[object_type]]
+id = "english_source"
+name = "English source"
