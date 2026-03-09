@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import logging
 import shutil
 from pathlib import Path
 
@@ -174,5 +175,13 @@ def init_english_profile(
     grammar_path: Path | None = None,
 ) -> None:
     """Load lexis and grammar from TSV/CSV into FalkorDB and SQLite."""
+    lexis_src = lexis_path or DEFAULT_LEXIS_PATH
+    grammar_src = grammar_path or DEFAULT_GRAMMAR_PATH
+    if not lexis_src.exists() or not grammar_src.exists():
+        logging.warning(
+            "English profile data missing (lexis=%s, grammar=%s); skip load",
+            lexis_src,
+            grammar_src,
+        )
     init_lexis_profile(graph, session, path=lexis_path)
     init_grammar_profile(graph, session, path=grammar_path)

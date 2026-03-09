@@ -68,6 +68,9 @@ tests/
 - **Docker / docker compose**: Set `API_PORT` (and optionally
   `FALKORDB_BROWSER_PORT` for falkordb-browser) in `.env`; no defaults in
   the repo. FalkorDB is not exposed to the host.
+- **CI**: `.github/workflows/ci.yml` — test, build image to GHCR, then
+  trigger deploy webhook. Set repo secret `DEPLOY_WEBHOOK_URL` to the
+  Portainer stack/service webhook URL for auto redeploy on push to main.
 - **Test**: `pytest`
 - **Lint / format**: `ruff check .` / `ruff format .`
 - **Type check**: `ty check`

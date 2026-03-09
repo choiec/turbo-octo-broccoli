@@ -71,7 +71,8 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - name: Trigger deploy webhook
+      # Set repo secret DEPLOY_WEBHOOK_URL to Portainer stack/service webhook URL for auto redeploy
+      - name: Trigger Portainer redeploy webhook
         env:
           DEPLOY_WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
         run: |
