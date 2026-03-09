@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel
 
 class QuestionLogBase(SQLModel):
     learner_id: str = Field(index=True)
-    item_id: str = Field(index=True)
+    task_item_id: str = Field(index=True)
     assigned_at: datetime
     due_date: datetime | None = Field(default=None)
 

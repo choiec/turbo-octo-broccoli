@@ -1,4 +1,4 @@
-"""Grammar tagging via LLM (B안): Testlet -> GrammarProfile guidewords."""
+"""Grammar tagging via LLM (B안): Task -> GrammarProfile guidewords."""
 
 from __future__ import annotations
 
@@ -84,16 +84,16 @@ def _call_llm(client: OpenAI, user_content: str) -> list[str]:
         return []
 
 
-def _tag_one_testlet(
+def _tag_one_task(
     graph: falkordb.Graph,
-    testlet_id: str,
+    task_id: str,
     text: str,
     index: dict[str, list[dict]],
     client: OpenAI,
     *,
     dry_run: bool = False,
 ) -> int:
-    from app.crud.english.inventory import testlet as testlet_crud
+    from app.crud.english.inventory import task as task_crud
 
     valid_guidewords = {
         e["guideword"] for entries in index.values() for e in entries
@@ -109,24 +109,22 @@ def _tag_one_testlet(
                 matched.add(gw)
     if not dry_run:
         for gw in matched:
-            testlet_crud.link_grammar(
-                graph, testlet_id=testlet_id, guideword=gw
-            )
+            task_crud.link_grammar(graph, task_id=task_id, guideword=gw)
     return len(matched)
 
 
-def tag_testlets(
+def tag_tasks(
     graph: falkordb.Graph,
-    testlet_list: list[tuple[str, str]],
+    task_list: list[tuple[str, str]],
     *,
     grammar_csv_path: Path | None = None,
     openai_api_key: str = "",
 ) -> int:
-    """Tag given testlets with grammar guidewords via LLM. Returns total links.
+    """Tag given tasks with grammar guidewords via LLM. Returns total links.
 
     Skips (returns 0) if openai_api_key is empty or grammar CSV is missing.
     """
-    if not openai_api_key or not testlet_list:
+    if not openai_api_key or not task_list:
         return 0
     path = grammar_csv_path or DEFAULT_GRAMMAR_CSV
     if not path.is_file():
@@ -138,8 +136,8 @@ def tag_testlets(
         return 0
     client = OpenAI(api_key=openai_api_key)
     total = 0
-    for testlet_id, text in testlet_list:
+    for task_id, text in task_list:
         if not text.strip():
             continue
-        total += _tag_one_testlet(graph, testlet_id, text, index, client)
+        total += _tag_one_task(graph, task_id, text, index, client)
     return total

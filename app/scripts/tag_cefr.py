@@ -262,7 +262,7 @@ def main() -> None:
 
     _ROOT = Path(__file__).resolve().parent.parent.parent
     _LEXIS_PATH = _ROOT / "temp" / "data" / "english" / "lexis_profile.tsv"
-    _KICE_JSON_DIR = _ROOT / "temp" / ".json" / "testlet"
+    _KICE_JSON_DIR = _ROOT / "temp" / ".json" / "task"
 
     if not _LEXIS_PATH.exists():
         print(f"Lexis profile not found: {_LEXIS_PATH}", file=sys.stderr)

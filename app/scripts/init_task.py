@@ -1,4 +1,4 @@
-"""Init Source + Testlet + Item from flat JSON (temp/.json/testlet/*.json)."""
+"""Init Source + Task + TaskItem from flat JSON (temp/.json/task/*.json)."""
 
 from __future__ import annotations
 
@@ -72,13 +72,13 @@ def init_from_json(
     *,
     dry_run: bool = False,
 ) -> tuple[int, int, list[tuple[str, str]]]:
-    """Load flat JSON; upsert Source, Testlets, Items.
+    """Load flat JSON; upsert Source, Tasks, TaskItems.
 
-    Returns (n_sources, n_testlets, [(testlet_id, text), ...]) for upserted
-    testlets with non-empty text (for grammar tagging).
+    Returns (n_sources, n_tasks, [(task_id, text), ...]) for upserted
+    tasks with non-empty text (for grammar tagging).
     """
-    from app.crud.english.inventory import item as item_crud
-    from app.crud.english.inventory import testlet
+    from app.crud.english.inventory import task
+    from app.crud.english.inventory import task_item as task_item_crud
     from app.crud.english.records import source as source_crud
 
     with open(json_path, encoding="utf-8") as f:
@@ -107,9 +107,9 @@ def init_from_json(
             form=form,
         )
 
-    testlet_count = 0
+    task_count = 0
 
-    # Regular single-item testlets: p18 .. p40
+    # Regular single-item tasks: p18 .. p40
     for n in range(18, 41):
         prefix = f"p{n}"
         if f"{prefix}_stem" not in data:
@@ -117,20 +117,20 @@ def init_from_json(
         text = str(data.get(f"{prefix}_text") or "").strip()
         item_data = _regular_item(data, n)
         question_group = str(n)
-        testlet_id = f"{source_id}_p{question_group}"
+        task_id = f"{source_id}_p{question_group}"
         if not dry_run:
-            testlet.upsert_testlet(
+            task.upsert_task(
                 graph,
-                testlet_id=testlet_id,
+                task_id=task_id,
                 source_id=source_id,
                 question_group=question_group,
                 text=text,
                 footnotes="",
             )
             cefr = str(data.get(f"{prefix}_cefr") or "").strip().lower() or ""
-            item_crud.upsert_item(
+            task_item_crud.upsert_task_item(
                 graph,
-                testlet_id=testlet_id,
+                task_id=task_id,
                 number=item_data["number"],
                 section=item_data["section"],
                 question_type=item_data["question_type"],
@@ -141,8 +141,8 @@ def init_from_json(
                 cefr=cefr,
             )
         if not dry_run and text:
-            tagged_list.append((testlet_id, text))
-        testlet_count += 1
+            tagged_list.append((task_id, text))
+        task_count += 1
 
     # Long passage p41: items 41, 42
     if "p41_text" in data:
@@ -150,20 +150,20 @@ def init_from_json(
         cefr = str(data.get("p41_cefr") or "").strip().lower() or ""
         items = _long_group_items(data, "p41", 41, 2)
         question_group = "41"
-        testlet_id = f"{source_id}_p{question_group}"
+        task_id = f"{source_id}_p{question_group}"
         if not dry_run:
-            testlet.upsert_testlet(
+            task.upsert_task(
                 graph,
-                testlet_id=testlet_id,
+                task_id=task_id,
                 source_id=source_id,
                 question_group=question_group,
                 text=text,
                 footnotes="",
             )
             for it in items:
-                item_crud.upsert_item(
+                task_item_crud.upsert_task_item(
                     graph,
-                    testlet_id=testlet_id,
+                    task_id=task_id,
                     number=it["number"],
                     section=it["section"],
                     question_type=it["question_type"],
@@ -174,8 +174,8 @@ def init_from_json(
                     cefr=cefr,
                 )
         if not dry_run and text:
-            tagged_list.append((testlet_id, text))
-        testlet_count += 1
+            tagged_list.append((task_id, text))
+        task_count += 1
 
     # Long passage p43: items 43, 44, 45
     if "p43_text" in data:
@@ -183,20 +183,20 @@ def init_from_json(
         cefr = str(data.get("p43_cefr") or "").strip().lower() or ""
         items = _long_group_items(data, "p43", 43, 3)
         question_group = "43"
-        testlet_id = f"{source_id}_p{question_group}"
+        task_id = f"{source_id}_p{question_group}"
         if not dry_run:
-            testlet.upsert_testlet(
+            task.upsert_task(
                 graph,
-                testlet_id=testlet_id,
+                task_id=task_id,
                 source_id=source_id,
                 question_group=question_group,
                 text=text,
                 footnotes="",
             )
             for it in items:
-                item_crud.upsert_item(
+                task_item_crud.upsert_task_item(
                     graph,
-                    testlet_id=testlet_id,
+                    task_id=task_id,
                     number=it["number"],
                     section=it["section"],
                     question_type=it["question_type"],
@@ -207,7 +207,7 @@ def init_from_json(
                     cefr=cefr,
                 )
         if not dry_run and text:
-            tagged_list.append((testlet_id, text))
-        testlet_count += 1
+            tagged_list.append((task_id, text))
+        task_count += 1
 
-    return 1, testlet_count, tagged_list
+    return 1, task_count, tagged_list

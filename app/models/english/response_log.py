@@ -9,7 +9,7 @@ from app.models.english.enums import RecallSource
 
 class ResponseLogBase(SQLModel):
     learner_id: str = Field(index=True)
-    item_id: str = Field(index=True)
+    task_item_id: str = Field(index=True)
     answer: str
     correct: bool
     duration_sec: int | None = Field(default=None)

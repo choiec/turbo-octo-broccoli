@@ -11,7 +11,7 @@ class RecallEventBase(SQLModel):
     actor_id: str = Field(index=True)
     occurred_at: datetime = Field(index=True)
     event_type: RecallEventType
-    item_id: str | None = Field(default=None)
+    task_item_id: str | None = Field(default=None)
     payload: str | None = Field(default=None)  # JSON
     confidence: float | None = Field(default=None)
     processed: bool = Field(default=False, index=True)

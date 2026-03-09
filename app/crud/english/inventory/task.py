@@ -1,25 +1,25 @@
-"""Testlet graph: Testlet (passage). Source in SQLite. Items are separate."""
+"""Task graph: Task (passage). Source in SQLite. TaskItems are separate."""
 
 from __future__ import annotations
 
 import falkordb
 
 
-def upsert_testlet(
+def upsert_task(
     graph: falkordb.Graph,
     *,
-    testlet_id: str,
+    task_id: str,
     source_id: str,
     question_group: str,
     text: str,
     footnotes: str = "",
 ) -> None:
-    """Create or update Testlet node (passage only).
+    """Create or update Task node (passage only).
     source_id references Source in SQLite; caller must ensure it exists.
-    Items are stored as separate Item nodes linked via HAS_ITEM.
+    TaskItems are stored as separate TaskItem nodes linked via HAS_TASK_ITEM.
     """
     q = (
-        "MERGE (t:Testlet {testlet_id: $testlet_id}) "
+        "MERGE (t:Task {task_id: $task_id}) "
         "ON CREATE SET t.source_id = $source_id, "
         "t.question_group = $question_group, t.text = $text, "
         "t.footnotes = $footnotes "
@@ -28,7 +28,7 @@ def upsert_testlet(
     graph.query(
         q,
         params={
-            "testlet_id": testlet_id,
+            "task_id": task_id,
             "source_id": source_id,
             "question_group": question_group,
             "text": text,
@@ -38,35 +38,35 @@ def upsert_testlet(
 
 
 def fetch_all(graph: falkordb.Graph) -> list[tuple[str, str]]:
-    """Return (testlet_id, text) for all Testlets with non-empty text."""
+    """Return (task_id, text) for all Tasks with non-empty text."""
     q = (
-        "MATCH (t:Testlet) WHERE t.text IS NOT NULL AND t.text <> '' "
-        "RETURN t.testlet_id, t.text"
+        "MATCH (t:Task) WHERE t.text IS NOT NULL AND t.text <> '' "
+        "RETURN t.task_id, t.text"
     )
     result = graph.query(q)
     return [(row[0], row[1]) for row in result.result_set]
 
 
-def is_grammar_tagged(graph: falkordb.Graph, testlet_id: str) -> bool:
-    """True if this Testlet has at least one CONTAINS_GRAMMAR edge."""
+def is_grammar_tagged(graph: falkordb.Graph, task_id: str) -> bool:
+    """True if this Task has at least one CONTAINS_GRAMMAR edge."""
     q = (
-        "MATCH (t:Testlet {testlet_id: $testlet_id})-[:CONTAINS_GRAMMAR]->() "
+        "MATCH (t:Task {task_id: $task_id})-[:CONTAINS_GRAMMAR]->() "
         "RETURN 1 LIMIT 1"
     )
-    result = graph.query(q, params={"testlet_id": testlet_id})
+    result = graph.query(q, params={"task_id": task_id})
     return len(result.result_set) > 0
 
 
 def link_grammar(
     graph: falkordb.Graph,
     *,
-    testlet_id: str,
+    task_id: str,
     guideword: str,
 ) -> None:
-    """Create Testlet -[:CONTAINS_GRAMMAR]-> GrammarProfile. No-op if missing."""
+    """Create Task -[:CONTAINS_GRAMMAR]-> GrammarProfile. No-op if missing."""
     q = (
-        "MATCH (t:Testlet {testlet_id: $testlet_id}) "
+        "MATCH (t:Task {task_id: $task_id}) "
         "MATCH (g:GrammarProfile {guideword: $guideword}) "
         "MERGE (t)-[:CONTAINS_GRAMMAR]->(g)"
     )
-    graph.query(q, params={"testlet_id": testlet_id, "guideword": guideword})
+    graph.query(q, params={"task_id": task_id, "guideword": guideword})

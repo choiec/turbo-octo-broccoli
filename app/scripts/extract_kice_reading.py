@@ -9,7 +9,7 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent.parent
 KICE_ROOT = _ROOT / "temp" / ".text" / "kice"
-OUT_DIR = _ROOT / "temp" / ".json" / "testlet"
+OUT_DIR = _ROOT / "temp" / ".json" / "task"
 
 OPTION_START = re.compile(r"[①②③④⑤]")
 RE_QUESTION_NUM = re.compile(r"^(\d{1,2})\.\s*")

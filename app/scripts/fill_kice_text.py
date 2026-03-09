@@ -7,9 +7,7 @@ import re
 import sys
 from pathlib import Path
 
-KICE_JSON_DIR = (
-    Path(__file__).resolve().parents[2] / "temp" / ".json" / "testlet"
-)
+KICE_JSON_DIR = Path(__file__).resolve().parents[2] / "temp" / ".json" / "task"
 
 
 def _split_stem(stem: str) -> tuple[str, str]:

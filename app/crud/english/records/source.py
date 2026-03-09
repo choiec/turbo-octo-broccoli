@@ -15,7 +15,7 @@ def upsert_source(
     academic_year: int | None = None,
     form: str | None = None,
     issuer: str = "KICE",
-    source_type: str = "testlet",
+    source_type: str = "task",
 ) -> Source:
     """Create or update a Source row by source_id. Idempotent."""
     row = session.get(Source, source_id)

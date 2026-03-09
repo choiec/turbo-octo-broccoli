@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel
 
 class ReviewScheduleBase(SQLModel):
     learner_id: str = Field(index=True)
-    item_id: str = Field(index=True)
+    task_item_id: str = Field(index=True)
     stability: float
     difficulty: float
     due_date: datetime = Field(index=True)

@@ -42,12 +42,12 @@ app/
   crud/
     english/
       records/           # SQLite query functions
-      inventory/         # FalkorDB query functions (cefr, grammar, lexis, testlet, item)
+      inventory/         # FalkorDB query functions (cefr, grammar, lexis, task, task_item)
   core/
     config.py            # pydantic Settings (reads .env)
     sqlite.py            # engine + get_session() dependency
     falkordb.py          # client + get_graph_conn() + init_graph_schema()
-  scripts/               # app-invokable scripts (init_english_profile, init_testlet, etc.)
+  scripts/               # app-invokable scripts (init_english_profile, init_task, etc.)
 docs/                    # AI-facing governance docs (this file)
 scripts/                 # standalone CLI and data pipelines (init_concepts, etc.)
 tests/

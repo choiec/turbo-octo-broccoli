@@ -1,4 +1,4 @@
-"""Admin CSV upload: lexis, grammar, testlet. Access via Cloudflare only."""
+"""Admin CSV upload: lexis, grammar, task. Access via Cloudflare only."""
 
 from __future__ import annotations
 
@@ -26,8 +26,8 @@ from app.scripts.init_grammar_unit import (
 from app.scripts.init_lexis_item import (
     init_from_json as init_lexis_item_from_json,
 )
-from app.scripts.init_testlet import init_from_json
-from app.scripts.tag_grammar import tag_testlets
+from app.scripts.init_task import init_from_json
+from app.scripts.tag_grammar import tag_tasks
 
 router = APIRouter()
 
@@ -201,21 +201,21 @@ def upload_grammar_item(
     return {"uploaded": len(results), "results": results}
 
 
-@router.post("/testlet")
-def upload_testlet(
+@router.post("/task")
+def upload_task(
     files: list[UploadFile] = File(...),
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
-    """Upload flat JSON to load Source (SQLite) and Testlet (FalkorDB)."""
+    """Upload flat JSON to load Source (SQLite) and Task (FalkorDB)."""
     results: list[dict] = []
     for upload in files:
         path = _save_upload_to_temp(upload)
         try:
-            sources, testlets, tagged_list = init_from_json(
+            sources, tasks, tagged_list = init_from_json(
                 path, session, graph, dry_run=False
             )
-            grammar_links = tag_testlets(
+            grammar_links = tag_tasks(
                 graph,
                 tagged_list,
                 grammar_csv_path=None,
@@ -225,7 +225,7 @@ def upload_testlet(
                 {
                     "filename": upload.filename or "questions.json",
                     "sources": sources,
-                    "testlets": testlets,
+                    "tasks": tasks,
                     "grammar_links": grammar_links,
                 }
             )
