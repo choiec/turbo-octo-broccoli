@@ -6,20 +6,27 @@ from pydantic import BaseModel
 
 class GrammarProfile(BaseModel):
     guideword: str
-    source: str
+    super_category: str | None
+    sub_category: str | None
+    type: str | None
 
 
 _QUERY = (
     "MATCH (g:GrammarProfile)-[:GRAMMATICAL_LEVEL]->"
-    "(l:CefrLevel {code: $cefr}) "
-    "RETURN g.guideword AS guideword, g.source AS source"
+    "(c:CefrLevel {code: $cefr}) "
+    "RETURN g.guideword, g.super_category, g.sub_category, g.type"
 )
 
 
 def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[GrammarProfile]:
     result = graph.query(_QUERY, params={"cefr": cefr.upper()})
     return [
-        GrammarProfile(guideword=row[0], source=row[1])
+        GrammarProfile(
+            guideword=row[0],
+            super_category=row[1],
+            sub_category=row[2],
+            type=row[3],
+        )
         for row in result.result_set
     ]
 
@@ -28,14 +35,18 @@ def upsert_grammar_profile(
     graph: falkordb.Graph,
     *,
     guideword: str,
-    source: str,
     cefr: str,
+    super_category: str | None = None,
+    sub_category: str | None = None,
+    type_: str | None = None,
 ) -> None:
     """Create or update GrammarProfile and link to CefrLevel. Idempotent."""
     q = (
         "MERGE (g:GrammarProfile {guideword: $guideword}) "
-        "ON CREATE SET g.source = $source "
-        "ON MATCH SET g.source = $source "
+        "ON CREATE SET g.super_category = $super_category, "
+        "g.sub_category = $sub_category, g.type = $type "
+        "ON MATCH SET g.super_category = $super_category, "
+        "g.sub_category = $sub_category, g.type = $type "
         "WITH g MERGE (c:CefrLevel {code: $cefr}) "
         "MERGE (g)-[:GRAMMATICAL_LEVEL]->(c)"
     )
@@ -43,7 +54,9 @@ def upsert_grammar_profile(
         q,
         params={
             "guideword": guideword,
-            "source": source,
             "cefr": cefr.upper(),
+            "super_category": super_category or "",
+            "sub_category": sub_category or "",
+            "type": type_ or "",
         },
     )

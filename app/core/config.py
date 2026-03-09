@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     sqlite_path: str = "./data/learner_portfolio.db"
+    db_reset_on_startup: bool = False
     falkordb_host: str = "localhost"
     falkordb_port: int = 56379
     falkordb_graph: str = "knowledge_graph"

@@ -7,14 +7,15 @@ from pydantic import BaseModel
 class LexisProfile(BaseModel):
     headword: str
     pos: str | None
-    synset_id: str | None
-    ngsl_rank: int | None
+    total_freq: float
+    total_nb_doc: int
+    freq: float
+    nb_doc: int
 
 
 _QUERY = (
-    "MATCH (l:LexisProfile)-[:LEXICAL_LEVEL]->(c:CefrLevel {code: $cefr}) "
-    "RETURN l.headword AS headword, l.pos AS pos, l.synset_id AS synset_id,"
-    " l.ngsl_rank AS ngsl_rank"
+    "MATCH (l:LexisProfile)-[r:LEXICAL_LEVEL]->(c:CefrLevel {code: $cefr}) "
+    "RETURN l.headword, l.pos, l.total_freq, l.total_nb_doc, r.freq, r.nb_doc"
 )
 
 
@@ -24,8 +25,10 @@ def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[LexisProfile]:
         LexisProfile(
             headword=row[0],
             pos=row[1],
-            synset_id=row[2],
-            ngsl_rank=row[3],
+            total_freq=float(row[2]) if row[2] is not None else 0.0,
+            total_nb_doc=int(row[3]) if row[3] is not None else 0,
+            freq=float(row[4]) if row[4] is not None else 0.0,
+            nb_doc=int(row[5]) if row[5] is not None else 0,
         )
         for row in result.result_set
     ]
@@ -35,28 +38,43 @@ def upsert_lexis_profile(
     graph: falkordb.Graph,
     *,
     headword: str,
-    cefr: str,
-    pos: str | None = None,
-    synset_id: str | None = None,
-    ngsl_rank: int | None = None,
+    pos: str | None,
+    total_freq: float,
+    total_nb_doc: int,
+    levels: list[tuple[str, float, int]],
 ) -> None:
-    """Create or update LexisProfile and link to CefrLevel. Idempotent."""
-    q = (
+    """Create or update LexisProfile and LEXICAL_LEVEL edges. Idempotent."""
+    node_q = (
         "MERGE (l:LexisProfile {headword: $headword}) "
-        "ON CREATE SET l.pos = $pos, l.synset_id = $synset_id, "
-        "l.ngsl_rank = $ngsl_rank "
-        "ON MATCH SET l.pos = $pos, l.synset_id = $synset_id, "
-        "l.ngsl_rank = $ngsl_rank "
-        "WITH l MERGE (c:CefrLevel {code: $cefr}) "
-        "MERGE (l)-[:LEXICAL_LEVEL]->(c)"
+        "ON CREATE SET l.pos = $pos, l.total_freq = $total_freq, "
+        "l.total_nb_doc = $total_nb_doc "
+        "ON MATCH SET l.pos = $pos, l.total_freq = $total_freq, "
+        "l.total_nb_doc = $total_nb_doc"
     )
     graph.query(
-        q,
+        node_q,
         params={
             "headword": headword,
-            "cefr": cefr.upper(),
             "pos": pos or "",
-            "synset_id": synset_id or "",
-            "ngsl_rank": ngsl_rank if ngsl_rank is not None else 0,
+            "total_freq": total_freq,
+            "total_nb_doc": total_nb_doc,
         },
     )
+    edge_q = (
+        "MATCH (l:LexisProfile {headword: $headword}) "
+        "MERGE (c:CefrLevel {code: $cefr}) "
+        "MERGE (l)-[r:LEXICAL_LEVEL]->(c) "
+        "SET r.freq = $freq, r.nb_doc = $nb_doc"
+    )
+    for cefr, freq, nb_doc in levels:
+        if freq <= 0:
+            continue
+        graph.query(
+            edge_q,
+            params={
+                "headword": headword,
+                "cefr": cefr.upper(),
+                "freq": freq,
+                "nb_doc": nb_doc,
+            },
+        )

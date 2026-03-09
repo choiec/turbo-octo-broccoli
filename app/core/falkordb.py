@@ -57,6 +57,17 @@ def get_graph_conn() -> Generator[falkordb.Graph, None, None]:
     yield _graph
 
 
+def reset_graph() -> None:
+    """Delete the graph and clear cached client so next use gets a fresh graph."""
+    global _client, _graph
+    _ensure_db()
+    with _init_lock:
+        if _graph is not None:
+            _graph.delete()
+        _graph = None
+        _client = None
+
+
 def init_graph_schema() -> None:
     """Init graph DB and indexes (startup or lazily on first use)."""
     _ensure_db()

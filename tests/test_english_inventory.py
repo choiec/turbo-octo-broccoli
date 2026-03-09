@@ -44,7 +44,7 @@ def _mock_graph_conn(
 
 def test_list_grammar_by_cefr() -> None:
     app.dependency_overrides[get_graph_conn] = lambda: next(
-        _mock_graph_conn([["present simple", "CEFR"]])
+        _mock_graph_conn([["present simple", "VERBS", "tense", "FORM"]])
     )
     response = client.get("/english/inventory/grammar/b1")
     assert response.status_code == 200
@@ -54,7 +54,7 @@ def test_list_grammar_by_cefr() -> None:
 
 def test_list_lexis_by_cefr() -> None:
     app.dependency_overrides[get_graph_conn] = lambda: next(
-        _mock_graph_conn([["apple", None, None, 1]])
+        _mock_graph_conn([["apple", "NN", 1.0, 5, 0.5, 2]])
     )
     response = client.get("/english/inventory/lexis/b1")
     assert response.status_code == 200
