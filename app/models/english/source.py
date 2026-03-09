@@ -8,10 +8,10 @@ class Source(SQLModel, table=True):
 
     __tablename__ = "english_source"
     source_id: str = Field(primary_key=True)
-    year: int
-    month: int
+    year: int | None = Field(default=None)
+    month: int | None = Field(default=None)
     exam_type: str
-    academic_year: int
+    academic_year: int | None = Field(default=None)
     form: str | None = Field(default=None)
     issuer: str = Field(default="KICE")
     source_type: str = Field(default="testlet")

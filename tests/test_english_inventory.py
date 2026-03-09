@@ -45,7 +45,17 @@ def _mock_graph_conn(
 def test_list_grammar_by_cefr() -> None:
     app.dependency_overrides[get_graph_conn] = lambda: next(
         _mock_graph_conn(
-            [["present simple", "VERBS", "tense", "FORM", "can use", "He works.", ""]]
+            [
+                [
+                    "present simple",
+                    "VERBS",
+                    "tense",
+                    "FORM",
+                    "can use",
+                    "He works.",
+                    "",
+                ]
+            ]
         )
     )
     response = client.get("/english/inventory/grammar/b1")

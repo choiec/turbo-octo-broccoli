@@ -19,6 +19,21 @@ _QUERY = (
 )
 
 
+_DOMINANT_CEFR_QUERY = (
+    "MATCH (l:LexisProfile {headword: $headword})"
+    "-[r:LEXIS_LEVEL]->(c:CefrLevel) "
+    "RETURN c.code ORDER BY r.freq DESC LIMIT 1"
+)
+
+
+def get_dominant_cefr(graph: falkordb.Graph, headword: str) -> str | None:
+    """Return the CEFR level with highest freq for this headword, or None."""
+    result = graph.query(_DOMINANT_CEFR_QUERY, params={"headword": headword})
+    if not result.result_set:
+        return None
+    return (result.result_set[0][0] or "").lower() or None
+
+
 def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[LexisProfile]:
     result = graph.query(_QUERY, params={"cefr": cefr.lower()})
     return [

@@ -17,6 +17,9 @@ from app.scripts.init_english_profile import (
     init_grammar_profile,
     init_lexis_profile,
 )
+from app.scripts.init_lexis_item import (
+    init_from_json as init_lexis_item_from_json,
+)
 from app.scripts.init_testlet import init_from_json
 from app.scripts.tag_grammar import tag_testlets
 
@@ -89,6 +92,37 @@ def upload_grammar(
                 {
                     "filename": upload.filename or "grammar.csv",
                     "rows_loaded": rows,
+                }
+            )
+        except Exception as e:
+            path.unlink(missing_ok=True)
+            return JSONResponse(
+                status_code=500,
+                content={"detail": str(e), "filename": upload.filename},
+            )
+        finally:
+            path.unlink(missing_ok=True)
+    return {"uploaded": len(results), "results": results}
+
+
+@router.post("/lexis-item")
+def upload_lexis_item(
+    files: list[UploadFile] = File(...),
+    graph: falkordb.Graph = Depends(get_graph_conn),
+):
+    """Upload lexis-*.json to load VocabList and LexisItem (FalkorDB)."""
+    results: list[dict] = []
+    for upload in files:
+        path = _save_upload_to_temp(upload)
+        try:
+            n_lists, n_items = init_lexis_item_from_json(
+                path, graph, dry_run=False
+            )
+            results.append(
+                {
+                    "filename": upload.filename or "lexis.json",
+                    "vocab_lists": n_lists,
+                    "lexis_items": n_items,
                 }
             )
         except Exception as e:
