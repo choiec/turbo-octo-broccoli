@@ -34,9 +34,9 @@ Thumbs.db
 # Temp
 temp/
 
-# Local-only (not for commit)
-scripts/
-tests/scripts/
+# Local-only (not for commit; root scripts/ only)
+/scripts/
+/tests/scripts/
 
 # DB files (SQLite, Kùzu)
 # data/

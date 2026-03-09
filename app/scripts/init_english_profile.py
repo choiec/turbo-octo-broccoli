@@ -22,7 +22,7 @@ _KNOWN_LEVIS_COLS = frozenset(
     | {"nb_doc@total"}
 )
 
-DEFAULT_LEXIS_PATH = _DATA_DIR / "lexis_profile.tsv"
+DEFAULT_LEXIS_PATH = _DATA_DIR / "lexis_profile.csv"
 DEFAULT_GRAMMAR_PATH = _DATA_DIR / "grammar_profile.csv"
 
 
@@ -49,8 +49,8 @@ def init_lexis_profile(
     session: Session,
     *,
     path: Path | None = None,
-) -> None:
-    """Load lexis from TSV into FalkorDB and SQLite lexis_profile."""
+) -> int:
+    """Load lexis from CSV into FalkorDB and SQLite lexis_profile. Returns rows loaded."""
     from app.crud.english.inventory import lexis
     from app.models.english.lexis_profile import (
         LexisProfile as LexisProfileTable,
@@ -58,17 +58,22 @@ def init_lexis_profile(
 
     src = path or DEFAULT_LEXIS_PATH
     if not src.exists():
-        return
-    _TEMP_DIR.mkdir(parents=True, exist_ok=True)
-    tmp = _TEMP_DIR / "lexis_profile.tsv"
-    shutil.copy(src, tmp)
+        return 0
+    use_direct = path is not None
+    if not use_direct:
+        _TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        tmp = _TEMP_DIR / "lexis_profile.csv"
+        shutil.copy(src, tmp)
+        src = tmp
+    count = 0
     try:
-        with open(tmp, encoding="utf-8") as f:
-            reader = csv.DictReader(f, delimiter="\t")
+        with open(src, encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f, delimiter=",")
             for row in reader:
                 headword = (row.get("word") or "").strip()
                 if not headword:
                     continue
+                count += 1
                 pos = (row.get("tag") or "").strip() or None
                 total_freq = _parse_float(row.get("total_freq@total") or "")
                 total_nb_doc = _parse_int(row.get("nb_doc@total") or "")
@@ -107,8 +112,9 @@ def init_lexis_profile(
                     )
         session.commit()
     finally:
-        if tmp.exists():
-            tmp.unlink(missing_ok=True)
+        if not use_direct and src.exists():
+            src.unlink(missing_ok=True)
+    return count
 
 
 def init_grammar_profile(
@@ -116,8 +122,8 @@ def init_grammar_profile(
     session: Session,
     *,
     path: Path | None = None,
-) -> None:
-    """Load grammar from CSV into FalkorDB and SQLite grammar_profile."""
+) -> int:
+    """Load grammar from CSV into FalkorDB and SQLite grammar_profile. Returns rows loaded."""
     from app.crud.english.inventory import grammar
     from app.models.english.grammar_profile import (
         GrammarProfile as GrammarProfileTable,
@@ -125,18 +131,23 @@ def init_grammar_profile(
 
     src = path or DEFAULT_GRAMMAR_PATH
     if not src.exists():
-        return
-    _TEMP_DIR.mkdir(parents=True, exist_ok=True)
-    tmp = _TEMP_DIR / "grammar_profile.csv"
-    shutil.copy(src, tmp)
+        return 0
+    use_direct = path is not None
+    if not use_direct:
+        _TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        tmp = _TEMP_DIR / "grammar_profile.csv"
+        shutil.copy(src, tmp)
+        src = tmp
+    count = 0
     try:
-        with open(tmp, encoding="utf-8", newline="") as f:
+        with open(src, encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 guideword = (row.get("guideword") or "").strip()
                 level = (row.get("Level") or "").strip().lower()
                 if not guideword or not level:
                     continue
+                count += 1
                 super_category = (
                     row.get("SuperCategory") or ""
                 ).strip() or None
@@ -163,8 +174,9 @@ def init_grammar_profile(
                 )
         session.commit()
     finally:
-        if tmp.exists():
-            tmp.unlink(missing_ok=True)
+        if not use_direct and src.exists():
+            src.unlink(missing_ok=True)
+    return count
 
 
 def init_english_profile(
