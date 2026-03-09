@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from app.models.english.grammar_item import GrammarItem, GrammarItemRead
 
@@ -55,7 +55,7 @@ def list_by_curriculum(
     rows = session.exec(
         select(GrammarItem)
         .where(GrammarItem.curriculum_id == curriculum_id)
-        .order_by(GrammarItem.session_number)
+        .order_by(col(GrammarItem.session_number))
     ).all()
     return [_to_read(r) for r in rows]
 

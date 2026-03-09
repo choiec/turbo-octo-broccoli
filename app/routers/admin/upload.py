@@ -17,6 +17,9 @@ from app.scripts.init_english_profile import (
     init_grammar_profile,
     init_lexis_profile,
 )
+from app.scripts.init_grammar_item import (
+    init_from_json as init_grammar_item_from_json,
+)
 from app.scripts.init_grammar_unit import (
     init_from_json as init_grammar_unit_from_json,
 )
@@ -157,6 +160,34 @@ def upload_grammar_unit(
                     "filename": upload.filename or "grammar.json",
                     "grammatical_sets": n_sets,
                     "grammar_links": n_items,
+                }
+            )
+        except Exception as e:
+            path.unlink(missing_ok=True)
+            return JSONResponse(
+                status_code=500,
+                content={"detail": str(e), "filename": upload.filename},
+            )
+        finally:
+            path.unlink(missing_ok=True)
+    return {"uploaded": len(results), "results": results}
+
+
+@router.post("/grammar-item")
+def upload_grammar_item(
+    files: list[UploadFile] = File(...),
+    session: Session = Depends(get_session),
+):
+    """Upload grammar_outlines.json to load GrammarItem rows (SQLite)."""
+    results: list[dict] = []
+    for upload in files:
+        path = _save_upload_to_temp(upload)
+        try:
+            n_sessions = init_grammar_item_from_json(path, session)
+            results.append(
+                {
+                    "filename": upload.filename or "grammar_outlines.json",
+                    "sessions_upserted": n_sessions,
                 }
             )
         except Exception as e:

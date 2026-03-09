@@ -32,6 +32,18 @@
     <div id="grammar-result" class="result"></div>
   </section>
   <section>
+    <h2>Grammatical Set</h2>
+    <label>JSON file(s) <input type="file" id="grammar-unit-files" name="files" multiple accept=".json"></label>
+    <button type="button" onclick="upload('grammar-unit')">Upload grammatical set</button>
+    <div id="grammar-unit-result" class="result"></div>
+  </section>
+  <section>
+    <h2>Grammar Item</h2>
+    <label>JSON file(s) <input type="file" id="grammar-item-files" name="files" multiple accept=".json"></label>
+    <button type="button" onclick="upload('grammar-item')">Upload grammar item</button>
+    <div id="grammar-item-result" class="result"></div>
+  </section>
+  <section>
     <h2>Testlet</h2>
     <label>JSON file(s) <input type="file" id="testlet-files" name="files" multiple accept=".json"></label>
     <button type="button" onclick="upload('testlet')">Upload testlet</button>
