@@ -1,4 +1,4 @@
-"""Admin CSV upload: lexis, grammar, testlet. All require Bearer token."""
+"""Admin CSV upload: lexis, grammar, testlet. Access via Cloudflare only."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import HTMLResponse
 from sqlmodel import Session
 
-from app.core.auth import verify_token
 from app.core.falkordb import get_graph_conn
 from app.core.sqlite import get_session
 from app.scripts.init_english_profile import (
@@ -47,7 +46,6 @@ def _save_upload_to_temp(upload: UploadFile) -> Path:
 @router.post("/lexis")
 def upload_lexis(
     files: list[UploadFile] = File(...),
-    _token: dict = Depends(verify_token),
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
@@ -71,7 +69,6 @@ def upload_lexis(
 @router.post("/grammar")
 def upload_grammar(
     files: list[UploadFile] = File(...),
-    _token: dict = Depends(verify_token),
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
@@ -95,7 +92,6 @@ def upload_grammar(
 @router.post("/testlet")
 def upload_testlet(
     files: list[UploadFile] = File(...),
-    _token: dict = Depends(verify_token),
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):

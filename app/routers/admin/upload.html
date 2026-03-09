@@ -17,8 +17,7 @@
 </head>
 <body>
   <h1>Admin CSV Upload</h1>
-  <p>Upload CSV files. Requires Bearer token (Entra).</p>
-  <label>Bearer token <input type="text" id="token" placeholder="Paste token"></label>
+  <p>Upload CSV files. Access controlled by Cloudflare.</p>
 
   <section>
     <h2>Lexis</h2>
@@ -43,12 +42,6 @@
     function upload(kind) {
       var input = document.getElementById(kind + '-files');
       var resultEl = document.getElementById(kind + '-result');
-      var token = document.getElementById('token').value.trim();
-      if (!token) {
-        resultEl.textContent = 'Enter Bearer token.';
-        resultEl.className = 'result error';
-        return;
-      }
       if (!input.files.length) {
         resultEl.textContent = 'Select at least one file.';
         resultEl.className = 'result error';
@@ -60,7 +53,6 @@
       resultEl.className = 'result';
       fetch('/admin/upload/' + kind, {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + token },
         body: fd
       }).then(function(r) {
         return r.json().then(function(data) {
