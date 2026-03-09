@@ -30,7 +30,6 @@ API contract: auto-generated OpenAPI from FastAPI (GET /docs).
 | **app/core/sqlite.py** | SQLAlchemy engine + `get_session()` FastAPI dependency. |
 | **app/core/falkordb.py** | FalkorDB client + `get_graph_conn()` + `init_graph_schema()`. |
 | **app/scripts/init_english_profile.py** | Init grammar/lexis from TSV/CSV (run manually). CefrLevel nodes come from Concept table via `cefr.ensure_cefr_levels()` at startup. |
-| **data/common/** | TOML: object_types.toml, concepts.toml (CEFR a1..c2, english_source testlet/book), link_types.toml. |
 | **scripts/init_concepts.py** | Load config TOML into SQLite (ObjectType, Concept, LinkType). Scheme-agnostic. Run: `uv run python scripts/init_concepts.py`. |
 
 ---
@@ -39,7 +38,7 @@ API contract: auto-generated OpenAPI from FastAPI (GET /docs).
 
 - **SQLite** — relational storage. Client: `app/core/sqlite.py`
   (`get_session()`). Schema via SQLModel. Env: `SQLITE_PATH`
-  (default: `./data/learner_portfolio.db`; no external server required).
+  (default: `./learner_portfolio.db`; no external server required).
 - **FalkorDB** — graph storage for the knowledge domain (grammar, lexis, Testlet
   nodes; Testlet holds passage + questions and references Source via source_id).
   Source metadata lives in SQLite. Client: `app/core/falkordb.py`

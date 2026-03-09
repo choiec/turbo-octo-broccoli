@@ -11,8 +11,8 @@ import falkordb
 from sqlmodel import Session
 
 _ROOT = Path(__file__).resolve().parent.parent.parent
-_DATA_DIR = _ROOT / "data" / "english"
-_TEMP_DIR = _ROOT / "data" / "english_profile_load"
+_DATA_DIR = _ROOT / "temp" / "data" / "english"
+_TEMP_DIR = _ROOT / "temp" / "english_profile_load"
 _LEVELS = ("a1", "a2", "b1", "b2", "c1", "c2")
 _KNOWN_LEVIS_COLS = frozenset(
     {"word", "tag"}

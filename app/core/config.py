@@ -9,7 +9,7 @@ _ENV_FILE = _ROOT / ".env"
 
 
 class Settings(BaseSettings):
-    sqlite_path: str = "./data/learner_portfolio.db"
+    sqlite_path: str = "./learner_portfolio.db"
     db_reset_on_startup: bool = False
     falkordb_host: str = "localhost"
     falkordb_port: int = 56379
