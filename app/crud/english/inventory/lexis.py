@@ -14,7 +14,7 @@ class LexisProfile(BaseModel):
 
 
 _QUERY = (
-    "MATCH (l:LexisProfile)-[r:LEXICAL_LEVEL]->(c:CefrLevel {code: $cefr}) "
+    "MATCH (l:LexisProfile)-[r:LEXIS_LEVEL]->(c:CefrLevel {code: $cefr}) "
     "RETURN l.headword, l.pos, l.total_freq, l.total_nb_doc, r.freq, r.nb_doc"
 )
 
@@ -43,7 +43,7 @@ def upsert_lexis_profile(
     total_nb_doc: int,
     levels: list[tuple[str, float, int]],
 ) -> None:
-    """Create or update LexisProfile and LEXICAL_LEVEL edges. Idempotent."""
+    """Create or update LexisProfile and LEXIS_LEVEL edges. Idempotent."""
     node_q = (
         "MERGE (l:LexisProfile {headword: $headword}) "
         "ON CREATE SET l.pos = $pos, l.total_freq = $total_freq, "
@@ -63,7 +63,7 @@ def upsert_lexis_profile(
     edge_q = (
         "MATCH (l:LexisProfile {headword: $headword}) "
         "MERGE (c:CefrLevel {code: $cefr}) "
-        "MERGE (l)-[r:LEXICAL_LEVEL]->(c) "
+        "MERGE (l)-[r:LEXIS_LEVEL]->(c) "
         "SET r.freq = $freq, r.nb_doc = $nb_doc"
     )
     for cefr, freq, nb_doc in levels:

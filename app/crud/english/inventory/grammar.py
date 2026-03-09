@@ -12,7 +12,7 @@ class GrammarProfile(BaseModel):
 
 
 _QUERY = (
-    "MATCH (g:GrammarProfile)-[:GRAMMATICAL_LEVEL]->"
+    "MATCH (g:GrammarProfile)-[:GRAMMAR_LEVEL]->"
     "(c:CefrLevel {code: $cefr}) "
     "RETURN g.guideword, g.super_category, g.sub_category, g.type"
 )
@@ -48,7 +48,7 @@ def upsert_grammar_profile(
         "ON MATCH SET g.super_category = $super_category, "
         "g.sub_category = $sub_category, g.type = $type "
         "WITH g MERGE (c:CefrLevel {code: $cefr}) "
-        "MERGE (g)-[:GRAMMATICAL_LEVEL]->(c)"
+        "MERGE (g)-[:GRAMMAR_LEVEL]->(c)"
     )
     graph.query(
         q,
