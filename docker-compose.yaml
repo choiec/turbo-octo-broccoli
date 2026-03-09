@@ -40,9 +40,5 @@ services:
         condition: service_healthy
 
 volumes:
-  app_data:
-    external: true
-    name: learner_portfolio_app_data
-  falkordb_data:
-    external: true
-    name: learner_portfolio_falkordb_data
+  app_data: {}
+  falkordb_data: {}

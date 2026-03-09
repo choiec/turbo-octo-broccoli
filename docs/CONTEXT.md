@@ -71,14 +71,7 @@ tests/
   default localhost:56379)
 - **Docker / docker compose**: Set `API_PORT` (and optionally
   `FALKORDB_BROWSER_PORT` for falkordb-browser) in `.env`; no defaults in
-  the repo. FalkorDB is not exposed to the host. Data lives in external
-  volumes so stack reloads (e.g. Portainer redeploy) do not wipe data.
-  **Before first deploy** create the volumes once: Portainer → Volumes →
-  Add volume → `learner_portfolio_app_data` and `learner_portfolio_falkordb_data`;
-  or on the host: `docker volume create learner_portfolio_app_data` and
-  `docker volume create learner_portfolio_falkordb_data`. For production
-  (including Portainer), set `DB_RESET_ON_STARTUP=false`; if `true`, the
-  app drops and recreates SQLite and FalkorDB on every startup.
+  the repo. FalkorDB is not exposed to the host.
 - **CI**: `.github/workflows/ci.yml` — test, build image to GHCR, then
   trigger deploy webhook. Set repo secret `DEPLOY_WEBHOOK_URL` to the
   Portainer stack/service webhook URL for auto redeploy on push to main.
