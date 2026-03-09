@@ -16,7 +16,7 @@ from app.core.falkordb import (
     init_graph_schema,
     reset_graph,
 )
-from app.core.sqlite import engine
+from app.core.sqlite import auto_migrate, engine
 from app.models.common.concept import Concept  # noqa: F401
 from app.models.common.link_type import LinkType  # noqa: F401
 from app.models.common.object_type import ObjectType  # noqa: F401
@@ -49,6 +49,8 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
         SQLModel.metadata.drop_all(engine)
         logging.warning("DB reset on startup: tables dropped")
     SQLModel.metadata.create_all(engine)
+    if not settings.db_reset_on_startup:
+        auto_migrate(engine)
     try:
         if settings.db_reset_on_startup:
             reset_graph()
