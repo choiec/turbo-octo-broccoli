@@ -50,11 +50,10 @@ def init_lexis_profile(
     *,
     path: Path | None = None,
 ) -> int:
-    """Load lexis CSV into FalkorDB and SQLite. Returns rows loaded."""
+    """Load lexis CSV into FalkorDB (profile + CEFR edges) and SQLite
+    (per-corpus frequency table). Returns rows loaded."""
     from app.crud.english.inventory import lexis
-    from app.models.english.lexis_profile import (
-        LexisProfile as LexisProfileTable,
-    )
+    from app.models.english.lexis_corpus_freq import LexisCorpusFreq
 
     src = path or DEFAULT_LEXIS_PATH
     if not src.exists():
@@ -104,7 +103,7 @@ def init_lexis_profile(
                         continue
                     corpus_name, cefr_level = parts
                     session.merge(
-                        LexisProfileTable(
+                        LexisCorpusFreq(
                             headword=headword,
                             corpus_name=corpus_name,
                             cefr_level=cefr_level.lower(),
@@ -120,15 +119,14 @@ def init_lexis_profile(
 
 def init_grammar_profile(
     graph: falkordb.Graph,
-    session: Session,
+    _session: Session | None = None,
     *,
     path: Path | None = None,
 ) -> int:
-    """Load grammar CSV into FalkorDB and SQLite. Returns rows loaded."""
+    """Load grammar CSV into FalkorDB (all fields as node properties).
+    Returns rows loaded. _session is accepted but unused (kept for call-site
+    compatibility with upload router)."""
     from app.crud.english.inventory import grammar
-    from app.models.english.grammar_profile import (
-        GrammarProfile as GrammarProfileTable,
-    )
 
     src = path or DEFAULT_GRAMMAR_PATH
     if not src.exists():
@@ -149,31 +147,19 @@ def init_grammar_profile(
                 if not guideword or not level:
                     continue
                 count += 1
-                super_category = (
-                    row.get("SuperCategory") or ""
-                ).strip() or None
-                sub_category = (row.get("SubCategory") or "").strip() or None
-                type_val = (row.get("type") or "").strip() or None
                 grammar.upsert_grammar_profile(
                     graph,
                     guideword=guideword,
                     cefr=level,
-                    super_category=super_category,
-                    sub_category=sub_category,
-                    type_=type_val,
+                    super_category=(row.get("SuperCategory") or "").strip()
+                    or None,
+                    sub_category=(row.get("SubCategory") or "").strip() or None,
+                    type_=(row.get("type") or "").strip() or None,
+                    can_do=(row.get("Can-do statement") or "").strip() or None,
+                    example=(row.get("Example") or "").strip() or None,
+                    lexical_range=(row.get("Lexical Range") or "").strip()
+                    or None,
                 )
-                can_do = (row.get("Can-do statement") or "").strip() or None
-                example = (row.get("Example") or "").strip() or None
-                lexical_range = (row.get("Lexical Range") or "").strip() or None
-                session.merge(
-                    GrammarProfileTable(
-                        guideword=guideword,
-                        can_do=can_do,
-                        example=example,
-                        lexical_range=lexical_range,
-                    )
-                )
-        session.commit()
     finally:
         if not use_direct and src.exists():
             src.unlink(missing_ok=True)
@@ -187,7 +173,11 @@ def init_english_profile(
     lexis_path: Path | None = None,
     grammar_path: Path | None = None,
 ) -> None:
-    """Load lexis and grammar from TSV/CSV into FalkorDB and SQLite."""
+    """Load lexis and grammar from TSV/CSV.
+
+    Lexis: FalkorDB (profile + CEFR edges) + SQLite (per-corpus freq).
+    Grammar: FalkorDB only (all fields as node properties).
+    """
     lexis_src = lexis_path or DEFAULT_LEXIS_PATH
     grammar_src = grammar_path or DEFAULT_GRAMMAR_PATH
     if not lexis_src.exists() or not grammar_src.exists():
@@ -197,4 +187,4 @@ def init_english_profile(
             grammar_src,
         )
     init_lexis_profile(graph, session, path=lexis_path)
-    init_grammar_profile(graph, session, path=grammar_path)
+    init_grammar_profile(graph, path=grammar_path)

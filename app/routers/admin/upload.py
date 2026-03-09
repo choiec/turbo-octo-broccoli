@@ -51,7 +51,7 @@ def upload_lexis(
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
-    """Upload CSV to load lexis profile into FalkorDB and SQLite."""
+    """Upload CSV: lexis profile into FalkorDB; per-corpus freq into SQLite."""
     results: list[dict] = []
     for upload in files:
         path = _save_upload_to_temp(upload)
@@ -78,14 +78,13 @@ def upload_lexis(
 def upload_grammar(
     files: list[UploadFile] = File(...),
     graph: falkordb.Graph = Depends(get_graph_conn),
-    session: Session = Depends(get_session),
 ):
-    """Upload CSV to load grammar profile into FalkorDB and SQLite."""
+    """Upload CSV: grammar profile into FalkorDB (all fields as node props)."""
     results: list[dict] = []
     for upload in files:
         path = _save_upload_to_temp(upload)
         try:
-            rows = init_grammar_profile(graph, session, path=path)
+            rows = init_grammar_profile(graph, path=path)
             results.append(
                 {
                     "filename": upload.filename or "grammar.csv",
