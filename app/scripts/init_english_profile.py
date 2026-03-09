@@ -50,7 +50,7 @@ def init_lexis_profile(
     *,
     path: Path | None = None,
 ) -> int:
-    """Load lexis from CSV into FalkorDB and SQLite lexis_profile. Returns rows loaded."""
+    """Load lexis CSV into FalkorDB and SQLite lexis_profile. Returns rows loaded."""
     from app.crud.english.inventory import lexis
     from app.models.english.lexis_profile import (
         LexisProfile as LexisProfileTable,
@@ -66,9 +66,10 @@ def init_lexis_profile(
         shutil.copy(src, tmp)
         src = tmp
     count = 0
+    delimiter = "\t" if src.suffix.lower() == ".tsv" else ","
     try:
         with open(src, encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f, delimiter=",")
+            reader = csv.DictReader(f, delimiter=delimiter)
             for row in reader:
                 headword = (row.get("word") or "").strip()
                 if not headword:
@@ -123,7 +124,7 @@ def init_grammar_profile(
     *,
     path: Path | None = None,
 ) -> int:
-    """Load grammar from CSV into FalkorDB and SQLite grammar_profile. Returns rows loaded."""
+    """Load grammar CSV into FalkorDB and SQLite grammar_profile. Returns rows loaded."""
     from app.crud.english.inventory import grammar
     from app.models.english.grammar_profile import (
         GrammarProfile as GrammarProfileTable,
