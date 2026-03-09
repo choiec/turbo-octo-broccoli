@@ -21,6 +21,7 @@ _INDEX_QUERIES = [
     "CREATE INDEX FOR (n:GrammarProfile) ON (n.guideword)",
     "CREATE INDEX FOR (n:LexisProfile) ON (n.headword)",
     "CREATE INDEX FOR (n:Testlet) ON (n.testlet_id)",
+    "CREATE INDEX FOR (n:Item) ON (n.item_id)",
 ]
 
 

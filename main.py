@@ -27,6 +27,19 @@ from app.models.english.lexis_profile import (  # noqa: F401
     LexisProfile as LexisProfileTable,
 )
 from app.models.english.source import Source  # noqa: F401
+from app.models.english.learner_profile import LearnerProfile  # noqa: F401
+from app.models.english.question_log import QuestionLog  # noqa: F401
+from app.models.english.response_log import ResponseLog  # noqa: F401
+from app.models.english.lesson_log import LessonLog  # noqa: F401
+from app.models.english.review_schedule import ReviewSchedule  # noqa: F401
+from app.models.english.fsrs_config import FsrsConfig  # noqa: F401
+from app.models.english.error_prior import ErrorPrior  # noqa: F401
+from app.models.english.essay_outcome import EssayOutcome  # noqa: F401
+from app.models.english.exam_period import (  # noqa: F401
+    ExamPeriod,
+    LearnerExamOverride,
+)
+from app.models.english.recall_event import RecallEvent  # noqa: F401
 from app.routers import admin, english
 
 

@@ -10,13 +10,15 @@ from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
 
+from app.core.config import settings
 from app.core.falkordb import get_graph_conn
 from app.core.sqlite import get_session
 from app.scripts.init_english_profile import (
     init_grammar_profile,
     init_lexis_profile,
 )
-from app.scripts.init_testlet import init_from_csv
+from app.scripts.init_testlet import init_from_json
+from app.scripts.tag_grammar import tag_testlets
 
 router = APIRouter()
 
@@ -107,19 +109,26 @@ def upload_testlet(
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
-    """Upload questions CSV to load Source (SQLite) and Testlet (FalkorDB)."""
+    """Upload flat JSON to load Source (SQLite) and Testlet (FalkorDB)."""
     results: list[dict] = []
     for upload in files:
         path = _save_upload_to_temp(upload)
         try:
-            sources, testlets = init_from_csv(
+            sources, testlets, tagged_list = init_from_json(
                 path, session, graph, dry_run=False
+            )
+            grammar_links = tag_testlets(
+                graph,
+                tagged_list,
+                grammar_csv_path=None,
+                openai_api_key=settings.openai_api_key or "",
             )
             results.append(
                 {
-                    "filename": upload.filename or "questions.csv",
+                    "filename": upload.filename or "questions.json",
                     "sources": sources,
                     "testlets": testlets,
+                    "grammar_links": grammar_links,
                 }
             )
         except Exception as e:

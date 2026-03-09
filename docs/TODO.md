@@ -32,6 +32,21 @@ API contract: auto-generated OpenAPI from FastAPI (GET /docs).
 | **app/scripts/init_english_profile.py** | Init grammar/lexis from TSV/CSV (run manually). CefrLevel nodes come from Concept table via `cefr.ensure_cefr_levels()` at startup. |
 | **scripts/init_concepts.py** | Load config TOML into SQLite (ObjectType, Concept, LinkType). Scheme-agnostic. Run: `uv run python scripts/init_concepts.py`. |
 
+### Phase 2 — Learner & FSRS models (SQLite) — implemented
+
+| Module | Table | Role |
+| --- | --- | --- |
+| **app/models/english/learner_profile.py** | `learner_profile` | Learner identity, CEFR level, grade, weekly schedule, session count. |
+| **app/models/english/question_log.py** | `question_log` | Assignment history: learner × item, assigned_at, due_date (未출제 필터). |
+| **app/models/english/response_log.py** | `response_log` | Per-item answer records: correct/incorrect, duration, source (recall \| direct). |
+| **app/models/english/lesson_log.py** | `lesson_log` | Session records: type (regular \| exam_prep), start/end timestamps. |
+| **app/models/english/review_schedule.py** | `review_schedule` | FSRS state per learner × item: stability, difficulty, due_date, retrievability. |
+| **app/models/english/fsrs_config.py** | `fsrs_config` | Per-learner FSRS W-vector (19 floats). Defaults to FSRS-5 published values. |
+| **app/models/english/error_prior.py** | `error_prior` | Level × question_type baseline error rates for cold-start blending. |
+| **app/models/english/essay_outcome.py** | `essay_outcome` | 4-axis AES rubric: accuracy, vocabulary, coherence, task_completion + feedback. |
+| **app/models/english/exam_period.py** | `exam_period`, `learner_exam_override` | Grade-level exam windows and per-learner overrides. |
+| **app/models/english/recall_event.py** | `recall_event` | Raw recall signals from Copilot Studio webhook; processed flag for FSRS batch. |
+
 ---
 
 ## Infrastructure

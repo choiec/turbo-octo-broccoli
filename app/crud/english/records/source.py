@@ -13,6 +13,7 @@ def upsert_source(
     month: int,
     exam_type: str,
     academic_year: int,
+    form: str | None = None,
     issuer: str = "KICE",
     source_type: str = "testlet",
 ) -> Source:
@@ -23,6 +24,7 @@ def upsert_source(
         row.month = month
         row.exam_type = exam_type
         row.academic_year = academic_year
+        row.form = form
         row.issuer = issuer
         row.source_type = source_type
         session.add(row)
@@ -33,6 +35,7 @@ def upsert_source(
             month=month,
             exam_type=exam_type,
             academic_year=academic_year,
+            form=form,
             issuer=issuer,
             source_type=source_type,
         )

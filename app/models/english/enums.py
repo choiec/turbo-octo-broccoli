@@ -23,3 +23,47 @@ class Skill(str, Enum):
     writing = "writing"
     listening = "listening"
     speaking = "speaking"
+
+
+class GradeTag(str, Enum):
+    grade_10 = "grade_10"
+    grade_11 = "grade_11"
+    grade_12 = "grade_12"
+    adult = "adult"
+
+
+class SessionType(str, Enum):
+    regular = "regular"
+    exam_prep = "exam_prep"
+
+
+class RecallSource(str, Enum):
+    recall = "recall"
+    direct = "direct"
+
+
+class ExamType(str, Enum):
+    midterm = "midterm"
+    final = "final"
+    suneung_mock = "suneung_mock"
+    suneung = "suneung"
+
+
+class QuestionType(str, Enum):
+    main_idea = "main_idea"
+    title = "title"
+    detail = "detail"
+    inference = "inference"
+    vocabulary = "vocabulary"
+    grammar = "grammar"
+    ordering = "ordering"
+    insertion = "insertion"
+    summary = "summary"
+    blank_filling = "blank_filling"
+    long_answer = "long_answer"
+
+
+class RecallEventType(str, Enum):
+    chat_recall = "chat_recall"
+    quiz_response = "quiz_response"
+    manual = "manual"

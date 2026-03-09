@@ -12,5 +12,6 @@ class Source(SQLModel, table=True):
     month: int
     exam_type: str
     academic_year: int
+    form: str | None = Field(default=None)
     issuer: str = Field(default="KICE")
     source_type: str = Field(default="testlet")

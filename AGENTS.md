@@ -22,15 +22,25 @@ Entry point: `main.py` → `app/routers/`
 main.py              # FastAPI() instance, router registration
 app/
   routers/
-    english/         # transaction data (practice, assessment, acquisition…)
-    knowledge/       # graph queries (grammar, lexis nodes in FalkorDB)
-  models/            # SQLModel table classes
+    admin/           # upload, admin-only endpoints
+    english/
+      records/       # transaction data (practice, assessment, acquisition…)
+      inventory/     # graph queries (grammar, lexis — FalkorDB)
+  models/
+    common/          # ObjectType, Concept, LinkType (SQLite)
+    english/         # SQLModel table classes (English domain)
   schemas/           # request/response schemas (when separate from models)
-  crud/              # DB query functions
+  crud/
+    english/
+      records/       # SQLite query functions
+      inventory/     # FalkorDB query functions (cefr, grammar, lexis, testlet, item)
   core/
     config.py        # pydantic Settings (env vars)
     sqlite.py        # engine + get_session() dependency (SQLite)
     falkordb.py      # client + get_graph_conn() dependency (FalkorDB)
+  scripts/           # app-invokable scripts (init_english_profile, init_testlet, etc.)
+docs/                # AI-facing governance docs
+scripts/             # standalone CLI and data pipelines (init_concepts, classify_cefr, etc.)
 tests/
 ```
 

@@ -30,22 +30,26 @@ When writing or editing AI-facing docs in this folder, follow RULES.md §D.
 main.py                  # FastAPI() instance, router registration
 app/
   routers/
+    admin/               # upload, admin-only endpoints
     english/
       records/           # transaction data (practice, assessment,
                          #   acquisition, proficiency, writing)
       inventory/         # graph queries (grammar, lexis — FalkorDB)
   models/
-    english/             # SQLModel table classes
+    common/              # ObjectType, Concept, LinkType (SQLite)
+    english/             # SQLModel table classes (English domain)
   schemas/               # request/response schemas (separate from models)
   crud/
     english/
       records/           # SQLite query functions
-      inventory/         # FalkorDB query functions
+      inventory/         # FalkorDB query functions (cefr, grammar, lexis, testlet, item)
   core/
     config.py            # pydantic Settings (reads .env)
     sqlite.py            # engine + get_session() dependency
     falkordb.py          # client + get_graph_conn() + init_graph_schema()
+  scripts/               # app-invokable scripts (init_english_profile, init_testlet, etc.)
 docs/                    # AI-facing governance docs (this file)
+scripts/                 # standalone CLI and data pipelines (init_concepts, etc.)
 tests/
 ```
 
