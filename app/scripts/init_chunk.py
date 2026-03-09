@@ -74,7 +74,9 @@ def _process_one_chunk(
         stem = str(q.get("question") or "").strip()
         raw_opts = q.get("options")
         if isinstance(raw_opts, list):
-            options_list: list[str] = [str(o or "").strip() for o in raw_opts[:5]]
+            options_list: list[str] = [
+                str(o or "").strip() for o in raw_opts[:5]
+            ]
         else:
             options_list = []
         while len(options_list) < 5:

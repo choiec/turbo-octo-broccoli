@@ -20,13 +20,21 @@ def init_from_json(path: Path, session) -> int:
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
-    sessions = data.get("sessions", [])
+    if isinstance(data, list):
+        sessions = data
+    elif isinstance(data, dict):
+        sessions = data.get("sessions", [])
+    else:
+        sessions = []
+
     for s in sessions:
+        if not isinstance(s, dict):
+            continue
         upsert(
             session,
-            curriculum_id=s["curriculum_id"],
-            session_number=int(s["session_number"]),
-            topic=s["topic"],
+            curriculum_id=s.get("curriculum_id", ""),
+            session_number=int(s.get("session_number", 0)),
+            topic=s.get("topic", ""),
             book_units=s.get("book_units") or [],
         )
     return len(sessions)
