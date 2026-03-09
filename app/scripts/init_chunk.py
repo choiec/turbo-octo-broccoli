@@ -74,11 +74,11 @@ def _process_one_chunk(
         stem = str(q.get("question") or "").strip()
         raw_opts = q.get("options")
         if isinstance(raw_opts, list):
-            options = [str(o or "").strip() for o in raw_opts[:5]]
+            options_list: list[str] = [str(o or "").strip() for o in raw_opts[:5]]
         else:
-            options = []
-        while len(options) < 5:
-            options.append("")
+            options_list = []
+        while len(options_list) < 5:
+            options_list.append("")
         answer = _chunk_answer_to_int(str(q.get("answer") or ""))
 
         if not dry_run:
@@ -89,7 +89,7 @@ def _process_one_chunk(
                 section="reading",
                 question_type="",
                 stem=stem,
-                options=options,
+                options=options_list,
                 answer=answer,
                 score=1,
                 cefr="",
