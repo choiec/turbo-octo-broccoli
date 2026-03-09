@@ -29,8 +29,8 @@ API contract: auto-generated OpenAPI from FastAPI (GET /docs).
 | **app/core/config.py** | Pydantic Settings; reads env vars from `.env`. |
 | **app/core/sqlite.py** | SQLAlchemy engine + `get_session()` FastAPI dependency. |
 | **app/core/falkordb.py** | FalkorDB client + `get_graph_conn()` + `init_graph_schema()`. |
-| **app/core/init_english_inventory.py** | Init grammar/lexis from TSV/CSV; calls `cefr.ensure_cefr_levels(graph, session)` so CefrLevel nodes come from Concept table. |
-| **app/data/common/** | TOML: object_types.toml, concepts.toml (CEFR a1..c2, english_source testlet/book), link_types.toml. |
+| **scripts/init_english_profile.py** | Init grammar/lexis from TSV/CSV (run manually). CefrLevel nodes come from Concept table via `cefr.ensure_cefr_levels()` at startup. |
+| **scripts/_data/common/** | TOML: object_types.toml, concepts.toml (CEFR a1..c2, english_source testlet/book), link_types.toml. |
 | **scripts/init_concepts.py** | Load config TOML into SQLite (ObjectType, Concept, LinkType). Scheme-agnostic. Run: `uv run python scripts/init_concepts.py`. |
 
 ---

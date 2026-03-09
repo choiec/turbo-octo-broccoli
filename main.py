@@ -16,10 +16,6 @@ from app.core.falkordb import (
     init_graph_schema,
     reset_graph,
 )
-from app.core.init_english_inventory import (
-    init_grammar_profile,
-    init_lexis_profile,
-)
 from app.core.sqlite import engine
 from app.models.common.concept import Concept  # noqa: F401
 from app.models.common.link_type import LinkType  # noqa: F401
@@ -51,8 +47,6 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
             from app.crud.english.inventory import cefr
 
             cefr.ensure_cefr_levels(graph, session)
-            init_lexis_profile(graph, session)
-            init_grammar_profile(graph, session)
     except GraphDbUnavailableError as e:
         logging.warning("FalkorDB unavailable at startup: %s", e)
     yield
