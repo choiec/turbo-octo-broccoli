@@ -1,4 +1,4 @@
-"""LexicalSet graph: lexical sets (단어장) containing LexisItems."""
+"""LexicalSet graph: lexical sets (vocabulary set) containing LexisItems."""
 
 from __future__ import annotations
 

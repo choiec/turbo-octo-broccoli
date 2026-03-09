@@ -1,4 +1,4 @@
-"""Extract English-only passages from temp/ 본문 into temp/english_only/."""
+"""Extract English-only passages from temp/ passage into temp/english_only/."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def _is_mostly_korean(line: str) -> bool:
     return korean_chars / len(s) >= 0.2
 
 
-# "본문 2-1 – Title" / "본문 1 – Title" section headers (drop).
+# "passage 2-1 – Title" / "passage 1 – Title" section headers (drop).
 _RE_BONMUN_HEADING = re.compile(r"^\s*본문\s+[\d\-]+\s*[–\-]\s*.+$")
 
 # Noise: page sep, standalone digits, publication header, [IMAGE].
@@ -52,12 +52,12 @@ def _is_noise_line(line: str) -> bool:
 
 
 def _remove_korean_inline(text: str) -> str:
-    """Remove trailing Korean (and spaces) on a line, e.g. '*word 한글뜻'."""
+    """Remove trailing Korean (and spaces) on a line, e.g. '*word Korean-gloss'."""
     return re.sub(r"[\uac00-\ud7a3\s]+$", "", text).rstrip()
 
 
 def _is_bonmun_heading(line: str) -> bool:
-    """Return True if line is a '본문 N-N – Title' style heading to drop."""
+    """Return True if line is a 'passage N-N – Title' style heading to drop."""
     return bool(_RE_BONMUN_HEADING.match(line.strip()))
 
 
@@ -151,7 +151,7 @@ def run(src: Path, out_root: Path, dry_run: bool) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Extract English-only passages from temp/ 본문 text files."
+        description="Extract English-only passages from temp/ passage text files."
     )
     parser.add_argument(
         "--src",

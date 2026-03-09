@@ -1,4 +1,4 @@
-"""Grammar tagging via LLM (B안): Task -> GrammarProfile guidewords."""
+"""Grammar tagging via LLM (option B): Task -> GrammarProfile guidewords."""
 
 from __future__ import annotations
 
