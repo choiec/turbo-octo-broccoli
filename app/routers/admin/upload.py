@@ -7,6 +7,7 @@ from pathlib import Path
 
 import falkordb
 from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi.responses import HTMLResponse
 from sqlmodel import Session
 
 from app.core.auth import verify_token
@@ -19,6 +20,14 @@ from app.scripts.init_english_profile import (
 from app.scripts.init_testlet import init_from_csv
 
 router = APIRouter()
+
+_UPLOAD_HTML_PATH = Path(__file__).resolve().parent / "upload.html"
+
+
+@router.get("", response_class=HTMLResponse)
+def upload_page() -> str:
+    """Serve upload form (GET). POST endpoints require Bearer token."""
+    return _UPLOAD_HTML_PATH.read_text(encoding="utf-8")
 
 
 def _save_upload_to_temp(upload: UploadFile) -> Path:

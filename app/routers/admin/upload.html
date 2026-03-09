@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin CSV Upload</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.25rem; }
+    section { margin: 1.5rem 0; padding: 1rem; border: 1px solid #ccc; border-radius: 6px; }
+    label { display: block; margin-top: 0.5rem; }
+    input[type="text"] { width: 100%; box-sizing: border-box; padding: 0.5rem; margin-top: 0.25rem; }
+    input[type="file"] { margin-top: 0.25rem; }
+    button { margin-top: 0.75rem; padding: 0.5rem 1rem; cursor: pointer; }
+    .result { margin-top: 0.5rem; white-space: pre-wrap; font-size: 0.875rem; }
+    .error { color: #c00; }
+  </style>
+</head>
+<body>
+  <h1>Admin CSV Upload</h1>
+  <p>Upload CSV files. Requires Bearer token (Entra).</p>
+  <label>Bearer token <input type="text" id="token" placeholder="Paste token"></label>
+
+  <section>
+    <h2>Lexis</h2>
+    <label>CSV file(s) <input type="file" id="lexis-files" name="files" multiple accept=".csv"></label>
+    <button type="button" onclick="upload('lexis')">Upload lexis</button>
+    <div id="lexis-result" class="result"></div>
+  </section>
+  <section>
+    <h2>Grammar</h2>
+    <label>CSV file(s) <input type="file" id="grammar-files" name="files" multiple accept=".csv"></label>
+    <button type="button" onclick="upload('grammar')">Upload grammar</button>
+    <div id="grammar-result" class="result"></div>
+  </section>
+  <section>
+    <h2>Testlet</h2>
+    <label>CSV file(s) <input type="file" id="testlet-files" name="files" multiple accept=".csv"></label>
+    <button type="button" onclick="upload('testlet')">Upload testlet</button>
+    <div id="testlet-result" class="result"></div>
+  </section>
+
+  <script>
+    function upload(kind) {
+      var input = document.getElementById(kind + '-files');
+      var resultEl = document.getElementById(kind + '-result');
+      var token = document.getElementById('token').value.trim();
+      if (!token) {
+        resultEl.textContent = 'Enter Bearer token.';
+        resultEl.className = 'result error';
+        return;
+      }
+      if (!input.files.length) {
+        resultEl.textContent = 'Select at least one file.';
+        resultEl.className = 'result error';
+        return;
+      }
+      var fd = new FormData();
+      for (var i = 0; i < input.files.length; i++) fd.append('files', input.files[i]);
+      resultEl.textContent = 'Uploading...';
+      resultEl.className = 'result';
+      fetch('/admin/upload/' + kind, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: fd
+      }).then(function(r) {
+        return r.json().then(function(data) {
+          if (r.ok) resultEl.textContent = JSON.stringify(data, null, 2);
+          else {
+            resultEl.textContent = (data.detail || r.status) + '\n' + JSON.stringify(data, null, 2);
+          }
+          if (!r.ok) resultEl.className = 'result error';
+        });
+      }).catch(function(e) {
+        resultEl.textContent = 'Error: ' + e.message;
+        resultEl.className = 'result error';
+      });
+    }
+  </script>
+</body>
+</html>
