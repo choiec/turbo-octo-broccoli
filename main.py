@@ -33,6 +33,7 @@ from app.scripts.init_english_profile import init_english_profile
 
 @asynccontextmanager
 async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
+    logging.info("db_reset_on_startup=%s", settings.db_reset_on_startup)
     Path(settings.sqlite_path).parent.mkdir(parents=True, exist_ok=True)
     if settings.db_reset_on_startup:
         SQLModel.metadata.drop_all(engine)
@@ -49,6 +50,7 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
 
             cefr.ensure_cefr_levels(graph, session)
             if settings.db_reset_on_startup:
+                logging.info("Loading English profile (grammar/lexis) into graph and SQLite")
                 init_english_profile(graph, session)
     except GraphDbUnavailableError as e:
         logging.warning("FalkorDB unavailable at startup: %s", e)
