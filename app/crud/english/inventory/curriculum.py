@@ -6,8 +6,8 @@ from app.models.english.curriculum import (
     Curriculum,
     CurriculumSession,
     CurriculumSessionUnit,
-    GrammarItemRead,
 )
+from app.schemas.english.inventory.curriculum import GrammarItemRead
 
 
 def upsert(

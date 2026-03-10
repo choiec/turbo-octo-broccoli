@@ -8,7 +8,8 @@ from sqlmodel import Session, SQLModel
 from app.core.auth import verify_token
 from app.core.sqlite import get_session
 from app.crud.english.records import learner_item as crud
-from app.models.english.learner_item import LearnerItem, LexisReviewScheduleRead
+from app.models.english.learner_item import LearnerItem
+from app.schemas.english.records.learner_item import LexisReviewScheduleRead
 
 router = APIRouter(
     prefix="/lexis-review-schedule", tags=["lexis-review-schedule"]

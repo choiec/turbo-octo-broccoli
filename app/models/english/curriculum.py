@@ -31,12 +31,3 @@ class CurriculumSessionUnit(SQLModel, table=True):
     set_id: str = Field(index=True)  # GrammaticalSet.set_id (FalkorDB)
 
     session: CurriculumSession | None = Relationship(back_populates="units")
-
-
-# API response schema (backward compatibility with GrammarItemRead)
-class GrammarItemRead(SQLModel):
-    id: int
-    curriculum_id: str
-    session_number: int
-    topic: str
-    book_units: list[str]

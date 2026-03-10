@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import falkordb
-from pydantic import BaseModel
 
 from app.crud.english.inventory.grammar import GrammarProfile
+from app.schemas.english.inventory.grammatical_set import GrammaticalSetMeta
 
 _LIST_ALL_QUERY = (
     "MATCH (s:GrammaticalSet) RETURN s.set_id, s.source, s.unit_num, s.title"
@@ -16,15 +16,6 @@ _LIST_BY_SET_QUERY = (
     " RETURN g.guideword, g.super_category, g.sub_category, g.type, "
     "g.can_do, g.example, g.lexical_range"
 )
-
-
-class GrammaticalSetMeta(BaseModel):
-    """Metadata for a single grammatical set (textbook TOC entry)."""
-
-    set_id: str
-    source: str
-    unit_num: int
-    title: str | None = None
 
 
 def upsert_grammatical_set(

@@ -5,21 +5,8 @@ from __future__ import annotations
 import json
 
 import falkordb
-from pydantic import BaseModel
 
-
-class TaskItem(BaseModel):
-    """Response schema for a single task item."""
-
-    task_item_id: str
-    number: int
-    section: str
-    question_type: str
-    stem: str
-    options: list[str]
-    answer: int
-    score: int
-
+from app.schemas.english.inventory.task_item import TaskItem
 
 _LIST_QUERY = (
     "MATCH (t:Task {task_id: $task_id})-[:HAS_TASK_ITEM]->(i:TaskItem) "

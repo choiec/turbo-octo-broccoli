@@ -3,18 +3,8 @@
 from __future__ import annotations
 
 import falkordb
-from pydantic import BaseModel
 
-
-class Task(BaseModel):
-    """Response schema for a single task (inventory list)."""
-
-    task_id: str
-    source_id: str
-    question_group: str
-    lexis_cefr: str | None = None
-    grammar_cefr: str | None = None
-
+from app.schemas.english.inventory.task import Task
 
 _LIST_BY_CEFR_QUERY = (
     "MATCH (t:Task) "

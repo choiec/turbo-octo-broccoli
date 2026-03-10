@@ -9,7 +9,7 @@ from app.core.falkordb import get_graph_conn
 from app.core.sqlite import get_session
 from app.crud.english.inventory import curriculum as crud
 from app.crud.english.inventory.grammar import GrammarProfile
-from app.models.english.curriculum import GrammarItemRead
+from app.schemas.english.inventory.curriculum import GrammarItemRead
 from app.services.english.grammar_session import list_profiles_for_session
 
 router = APIRouter(prefix="/grammar-items", tags=["inventory_grammar_item"])

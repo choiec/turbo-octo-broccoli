@@ -7,8 +7,8 @@ from app.core.auth import verify_token
 from app.core.falkordb import get_graph_conn
 from app.crud.english.inventory import task as task_crud
 from app.crud.english.inventory import task_item as task_item_crud
-from app.crud.english.inventory.task import Task
-from app.crud.english.inventory.task_item import TaskItem
+from app.schemas.english.inventory.task import Task
+from app.schemas.english.inventory.task_item import TaskItem
 
 router = APIRouter(prefix="/task", tags=["inventory_task"])
 
