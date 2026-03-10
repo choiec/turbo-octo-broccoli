@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import falkordb
 
+from app.crud.english.inventory.lexis_item_write import (
+    link_cefr,
+    link_profile,
+    upsert_lexis_item,
+)
 from app.schemas.english.inventory.lexis_item import (
     LexisItemSchema,
     LexisItemWithProfile,

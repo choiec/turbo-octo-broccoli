@@ -1,4 +1,4 @@
-"""Grammar tagging via LLM (option B): Task -> GrammarProfile guidewords."""
+"""Grammar tagging via LLM (option B): TaskParagraph -> GrammarProfile guidewords."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def _tag_one_task(
         for gw in matched:
             task_crud.link_grammar(graph, task_id=task_id, guideword=gw)
         _grammar_cefr_q = (
-            "MATCH (t:Task {task_id: $task_id})-[:CONTAINS_GRAMMAR]->"
+            "MATCH (t:TaskParagraph {task_id: $task_id})-[:CONTAINS_GRAMMAR]->"
             "(g:GrammarProfile)-[:GRAMMAR_LEVEL]->(c:CefrLevel) "
             "RETURN c.code"
         )

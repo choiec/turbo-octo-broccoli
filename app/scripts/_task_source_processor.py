@@ -1,4 +1,4 @@
-"""Process one source dict: upsert Source, Tasks, TaskItems."""
+"""Process one source dict: upsert Source, TaskParagraphs, TaskItems."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ def process_one_source(
     graph: falkordb.Graph,
     dry_run: bool,
 ) -> tuple[int, int, list[tuple[str, str]]]:
-    """Process a single source dict; upsert Source, Tasks, TaskItems.
+    """Process a single source dict; upsert Source, TaskParagraphs, TaskItems.
 
     Returns (n_sources, n_tasks, [(task_id, text), ...]) for this source.
     """

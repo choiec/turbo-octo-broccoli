@@ -3,8 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
-class Task(BaseModel):
-    """Response schema for a single task (inventory list)."""
+class TaskParagraph(BaseModel):
+    """Response schema for a single task paragraph (inventory list)."""
 
     task_id: str
     source_id: str

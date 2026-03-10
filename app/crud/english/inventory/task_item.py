@@ -1,4 +1,4 @@
-"""TaskItem graph: individual test items linked to Task."""
+"""TaskItem graph: individual test items linked to TaskParagraph."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import falkordb
 from app.schemas.english.inventory.task_item import TaskItem
 
 _LIST_QUERY = (
-    "MATCH (t:Task {task_id: $task_id})-[:HAS_TASK_ITEM]->(i:TaskItem) "
+    "MATCH (t:TaskParagraph {task_id: $task_id})-[:HAS_TASK_ITEM]->(i:TaskItem) "
     "RETURN i.task_item_id, i.number, i.section, i.question_type, i.stem, "
     "i.options, i.answer, i.score"
 )
@@ -52,7 +52,7 @@ def upsert_task_item(
     answer: int,
     score: int,
 ) -> None:
-    """Create or update TaskItem node, link to Task."""
+    """Create or update TaskItem node, link to TaskParagraph."""
     task_item_id = f"{task_id}_i{number}"
     options_json = json.dumps(options)
 
@@ -80,7 +80,7 @@ def upsert_task_item(
     )
 
     link_q = (
-        "MATCH (t:Task {task_id: $task_id}), "
+        "MATCH (t:TaskParagraph {task_id: $task_id}), "
         "(i:TaskItem {task_item_id: $task_item_id}) "
         "MERGE (t)-[:HAS_TASK_ITEM]->(i)"
     )

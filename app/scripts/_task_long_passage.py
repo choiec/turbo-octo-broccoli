@@ -19,7 +19,7 @@ def upsert_long_passage(
     dry_run: bool,
     tagged_list: list[tuple[str, str]],
 ) -> int:
-    """Upsert Task and TaskItems for one long passage. Returns 1 or 0."""
+    """Upsert TaskParagraph and TaskItems for one long passage. Returns 1 or 0."""
     from app.crud.english.inventory import task
     from app.crud.english.inventory import task_item as task_item_crud
 

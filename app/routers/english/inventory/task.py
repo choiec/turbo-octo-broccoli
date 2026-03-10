@@ -7,7 +7,7 @@ from app.core.auth import verify_token
 from app.core.falkordb import get_graph_conn
 from app.crud.english.inventory import task as task_crud
 from app.crud.english.inventory import task_item as task_item_crud
-from app.schemas.english.inventory.task import Task
+from app.schemas.english.inventory.task import TaskParagraph
 from app.schemas.english.inventory.task_item import TaskItem
 
 router = APIRouter(prefix="/task", tags=["inventory_task"])
@@ -23,11 +23,11 @@ def list_task_items(
     return task_item_crud.list_by_task(graph, task_id)
 
 
-@router.get("/{cefr}", response_model=list[Task])
+@router.get("/{cefr}", response_model=list[TaskParagraph])
 def list_tasks_by_cefr(
     cefr: str,
     graph: falkordb.Graph = Depends(get_graph_conn),
     _: dict[str, object] = Depends(verify_token),
-) -> list[Task]:
-    """Return tasks whose lexis_cefr or grammar_cefr matches the CEFR level."""
+) -> list[TaskParagraph]:
+    """Return task paragraphs whose lexis_cefr or grammar_cefr matches the CEFR level."""
     return task_crud.list_by_cefr(graph, cefr)

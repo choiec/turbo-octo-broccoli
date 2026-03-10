@@ -1,4 +1,4 @@
-"""Task graph: link Task to GrammarProfile/LexisProfile and set CEFR."""
+"""TaskParagraph graph: link TaskParagraph to GrammarProfile/LexisProfile and set CEFR."""
 
 from __future__ import annotations
 
@@ -6,9 +6,9 @@ import falkordb
 
 
 def is_grammar_tagged(graph: falkordb.Graph, task_id: str) -> bool:
-    """True if this Task has at least one CONTAINS_GRAMMAR edge."""
+    """True if this TaskParagraph has at least one CONTAINS_GRAMMAR edge."""
     q = (
-        "MATCH (t:Task {task_id: $task_id})-[:CONTAINS_GRAMMAR]->() "
+        "MATCH (t:TaskParagraph {task_id: $task_id})-[:CONTAINS_GRAMMAR]->() "
         "RETURN 1 LIMIT 1"
     )
     result = graph.query(q, params={"task_id": task_id})
@@ -21,9 +21,9 @@ def link_grammar(
     task_id: str,
     guideword: str,
 ) -> None:
-    """Create Task -[:CONTAINS_GRAMMAR]-> GrammarProfile. No-op if missing."""
+    """Create TaskParagraph -[:CONTAINS_GRAMMAR]-> GrammarProfile. No-op if missing."""
     q = (
-        "MATCH (t:Task {task_id: $task_id}) "
+        "MATCH (t:TaskParagraph {task_id: $task_id}) "
         "MATCH (g:GrammarProfile {guideword: $guideword}) "
         "MERGE (t)-[:CONTAINS_GRAMMAR]->(g)"
     )
@@ -31,9 +31,9 @@ def link_grammar(
 
 
 def is_lexis_tagged(graph: falkordb.Graph, task_id: str) -> bool:
-    """True if this Task has at least one CONTAINS_LEXIS edge."""
+    """True if this TaskParagraph has at least one CONTAINS_LEXIS edge."""
     q = (
-        "MATCH (t:Task {task_id: $task_id})-[:CONTAINS_LEXIS]->() "
+        "MATCH (t:TaskParagraph {task_id: $task_id})-[:CONTAINS_LEXIS]->() "
         "RETURN 1 LIMIT 1"
     )
     result = graph.query(q, params={"task_id": task_id})
@@ -46,9 +46,9 @@ def link_lexis(
     task_id: str,
     headword: str,
 ) -> None:
-    """Create Task -[:CONTAINS_LEXIS]-> LexisProfile. No-op if missing."""
+    """Create TaskParagraph -[:CONTAINS_LEXIS]-> LexisProfile. No-op if missing."""
     q = (
-        "MATCH (t:Task {task_id: $task_id}) "
+        "MATCH (t:TaskParagraph {task_id: $task_id}) "
         "MATCH (l:LexisProfile {headword: $headword}) "
         "MERGE (t)-[:CONTAINS_LEXIS]->(l)"
     )
@@ -62,7 +62,7 @@ def set_task_cefr(
     lexis_cefr: str | None = None,
     grammar_cefr: str | None = None,
 ) -> None:
-    """Set lexis_cefr and/or grammar_cefr on Task. None = leave unchanged."""
+    """Set lexis_cefr and/or grammar_cefr on TaskParagraph. None = leave unchanged."""
     if lexis_cefr is None and grammar_cefr is None:
         return
     parts: list[str] = []
@@ -73,5 +73,5 @@ def set_task_cefr(
     if grammar_cefr is not None:
         parts.append("t.grammar_cefr = $grammar_cefr")
         params["grammar_cefr"] = grammar_cefr.lower()
-    q = f"MATCH (t:Task {{task_id: $task_id}}) SET {', '.join(parts)}"
+    q = f"MATCH (t:TaskParagraph {{task_id: $task_id}}) SET {', '.join(parts)}"
     graph.query(q, params=params)

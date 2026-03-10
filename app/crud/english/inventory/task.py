@@ -1,4 +1,4 @@
-"""Task graph: Task (passage). Source in SQLite. TaskItems are separate."""
+"""TaskParagraph graph: TaskParagraph (passage). Source in SQLite. TaskItems are separate."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from app.crud.english.inventory.task_links import (
     link_lexis,
     set_task_cefr,
 )  # noqa: F401 — re-export for callers that import task
-from app.schemas.english.inventory.task import Task
+from app.schemas.english.inventory.task import TaskParagraph
 
 __all__ = [
     "fetch_all",
@@ -25,19 +25,19 @@ __all__ = [
 ]
 
 _LIST_BY_CEFR_QUERY = (
-    "MATCH (t:Task) "
+    "MATCH (t:TaskParagraph) "
     "WHERE t.lexis_cefr = $cefr OR t.grammar_cefr = $cefr "
     "RETURN t.task_id, t.source_id, t.question_group, "
     "t.lexis_cefr, t.grammar_cefr"
 )
 
 
-def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[Task]:
-    """Return tasks whose lexis_cefr or grammar_cefr matches the given level."""
+def list_by_cefr(graph: falkordb.Graph, cefr: str) -> list[TaskParagraph]:
+    """Return task paragraphs whose lexis_cefr or grammar_cefr matches the given level."""
     cefr_lower = cefr.strip().lower()
     result = graph.query(_LIST_BY_CEFR_QUERY, params={"cefr": cefr_lower})
     return [
-        Task(
+        TaskParagraph(
             task_id=row[0] or "",
             source_id=row[1] or "",
             question_group=row[2] or "",
@@ -57,12 +57,12 @@ def upsert_task(
     text: str,
     footnotes: str = "",
 ) -> None:
-    """Create or update Task node (passage only).
+    """Create or update TaskParagraph node (passage only).
     source_id references Source in SQLite; caller must ensure it exists.
     TaskItems are stored as separate TaskItem nodes linked via HAS_TASK_ITEM.
     """
     q = (
-        "MERGE (t:Task {task_id: $task_id}) "
+        "MERGE (t:TaskParagraph {task_id: $task_id}) "
         "ON CREATE SET t.source_id = $source_id, "
         "t.question_group = $question_group, t.text = $text, "
         "t.footnotes = $footnotes "
@@ -81,9 +81,9 @@ def upsert_task(
 
 
 def fetch_all(graph: falkordb.Graph) -> list[tuple[str, str]]:
-    """Return (task_id, text) for all Tasks with non-empty text."""
+    """Return (task_id, text) for all TaskParagraphs with non-empty text."""
     q = (
-        "MATCH (t:Task) WHERE t.text IS NOT NULL AND t.text <> '' "
+        "MATCH (t:TaskParagraph) WHERE t.text IS NOT NULL AND t.text <> '' "
         "RETURN t.task_id, t.text"
     )
     result = graph.query(q)

@@ -1,4 +1,4 @@
-"""Lexis tagging: Task -> LexisProfile (CONTAINS_LEXIS) and lexis_cefr."""
+"""Lexis tagging: TaskParagraph -> LexisProfile (CONTAINS_LEXIS) and lexis_cefr."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def _tag_one_task(
         task_crud.link_lexis(graph, task_id=task_id, headword=lemma)
 
     headwords_q = (
-        "MATCH (t:Task {task_id: $task_id})-[:CONTAINS_LEXIS]->(l:LexisProfile)"
+        "MATCH (t:TaskParagraph {task_id: $task_id})-[:CONTAINS_LEXIS]->(l:LexisProfile)"
         " RETURN l.headword"
     )
     result = graph.query(headwords_q, params={"task_id": task_id})

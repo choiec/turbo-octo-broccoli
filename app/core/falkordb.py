@@ -20,7 +20,7 @@ _INDEX_QUERIES = [
     "CREATE INDEX FOR (n:CefrLevel) ON (n.code)",
     "CREATE INDEX FOR (n:GrammarProfile) ON (n.guideword)",
     "CREATE INDEX FOR (n:LexisProfile) ON (n.headword)",
-    "CREATE INDEX FOR (n:Task) ON (n.task_id)",
+    "CREATE INDEX FOR (n:TaskParagraph) ON (n.task_id)",
     "CREATE INDEX FOR (n:TaskItem) ON (n.task_item_id)",
     "CREATE INDEX FOR (n:LexisItem) ON (n.item_id)",
 ]
