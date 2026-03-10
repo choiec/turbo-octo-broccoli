@@ -7,6 +7,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
+from app.core.config import settings
 from app.core.falkordb import get_graph_conn
 from app.core.sqlite import get_session
 from app.routers.admin._upload_helpers import (
@@ -15,6 +16,8 @@ from app.routers.admin._upload_helpers import (
 )
 from app.scripts.init_chunk import init_from_json as init_chunk_from_json
 from app.scripts.init_task import init_from_json
+from app.scripts.tag_grammar import tag_tasks
+from app.scripts.tag_lexis import tag_tasks as tag_lexis_tasks
 
 router = APIRouter()
 
@@ -59,14 +62,13 @@ def upload_task(
 
 @router.post("/chunk")
 def upload_chunk(
-    background_tasks: BackgroundTasks,
     files: list[UploadFile] = File(...),
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
     """Upload chunk JSON to load Source and Task.
 
-    Grammar tagging runs as a background task after the response.
+    Grammar and lexis tagging run synchronously before the response.
     """
     results: list[dict] = []
     for upload in files:
@@ -75,13 +77,19 @@ def upload_chunk(
             sources, tasks, tagged_list = init_chunk_from_json(
                 path, session, graph, dry_run=False
             )
-            tagging = enqueue_tagging(background_tasks, graph, tagged_list)
+            n_links = tag_tasks(
+                graph,
+                tagged_list,
+                grammar_csv_path=None,
+                openai_api_key=settings.openai_api_key or "",
+            )
+            tag_lexis_tasks(graph, tagged_list)
             results.append(
                 {
                     "filename": upload.filename or "chunks.json",
                     "sources": sources,
                     "tasks": tasks,
-                    "grammar_tagging": tagging,
+                    "grammar_links": n_links,
                 }
             )
         except Exception as e:
