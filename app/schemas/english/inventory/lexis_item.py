@@ -12,7 +12,18 @@ class LexisItemSchema(BaseModel):
     headword: str
     pos: str | None
     definition: str
+    synset_id: str | None = None
+    example: str | None = None
     cefr: str | None = None
+    importance: int | None = None
+    forms: list[str] = []
+    synonyms: list[str] = []
+    antonyms: list[str] = []
+    derivations: list[str] = []
+    hypernym_ids: list[str] = []
+    hyponym_ids: list[str] = []
+    similar_ids: list[str] = []
+    also_ids: list[str] = []
 
 
 class LexisItemWithProfile(LexisItemSchema):

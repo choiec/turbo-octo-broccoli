@@ -72,3 +72,19 @@ def upload_lexis_set(
     return upload_lexis_json(
         files, graph, session, "lexis.json", init_lexis_item_from_json
     )
+
+
+@router.post("/lexis-oewn")
+def upload_lexis_oewn(
+    files: list[UploadFile] = File(...),
+    graph: falkordb.Graph = Depends(get_graph_conn),
+    session: Session = Depends(get_session),
+):
+    """Upload OEWN 2025 senses JSON (from fetch_oewn.py). LexisItem only, no LexisSet."""
+    return upload_lexis_json(
+        files,
+        graph,
+        session,
+        "oewn_2025_senses.json",
+        init_lexis_item_from_json,
+    )

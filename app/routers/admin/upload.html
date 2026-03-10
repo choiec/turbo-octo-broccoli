@@ -32,6 +32,13 @@
     <div id="lexis-item-result" class="result"></div>
   </section>
   <section>
+    <h2>OEWN 2025 Senses</h2>
+    <p>Upload <code>oewn_2025_senses.json</code> from <code>scripts/fetch_oewn.py</code>. Creates LexisItem nodes only (no LexisSet).</p>
+    <label>JSON file(s) <input type="file" id="lexis-oewn-files" name="files" multiple accept=".json"></label>
+    <button type="button" onclick="upload('lexis-oewn')">Upload OEWN senses</button>
+    <div id="lexis-oewn-result" class="result"></div>
+  </section>
+  <section>
     <h2>Lexis Set</h2>
     <label>JSON file(s) <input type="file" id="lexis-set-files" name="files" multiple accept=".json"></label>
     <button type="button" onclick="upload('lexis-set')">Upload lexis set</button>

@@ -23,6 +23,7 @@ _INDEX_QUERIES = [
     "CREATE INDEX FOR (n:TaskParagraph) ON (n.task_id)",
     "CREATE INDEX FOR (n:TaskItem) ON (n.task_item_id)",
     "CREATE INDEX FOR (n:LexisItem) ON (n.item_id)",
+    "CREATE INDEX FOR (n:LexisSynset) ON (n.synset_id)",
 ]
 
 

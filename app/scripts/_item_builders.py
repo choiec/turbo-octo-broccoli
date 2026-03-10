@@ -4,12 +4,16 @@ from __future__ import annotations
 
 from typing import Any
 
-ANSWER_MAP = {"①": 1, "②": 2, "③": 3, "④": 4, "⑤": 5}
+_CIRCLE_TO_INT = {"①": 1, "②": 2, "③": 3, "④": 4, "⑤": 5}
 
 
-def answer_to_int(a: str) -> int:
+def answer_to_int(a: str | int) -> int:
+    if isinstance(a, int):
+        return a
     a = (a or "").strip()
-    return ANSWER_MAP.get(a, 0)
+    if a.isdigit():
+        return int(a)
+    return _CIRCLE_TO_INT.get(a, 0)
 
 
 def opts(data: dict[str, Any], prefix: str) -> list[str]:
