@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from sqlmodel import Session, select
 
-from app.core.fsrs import initialise_item, schedule_item
+from app.core.fsrs import initialise_item_state, schedule_review
 from app.models.english.fsrs_config import FsrsConfig
 from app.models.english.learner_item import LearnerItem
 
@@ -48,7 +48,7 @@ def upsert_review_schedule(
     session: Session,
     learner_id: str,
     task_item_id: str,
-    response_rating: int,
+    attempt_quality: int,
 ) -> LearnerItem:
     """Upsert FSRS state for a task_item (item_type=task_item)."""
     return _upsert(
@@ -56,7 +56,7 @@ def upsert_review_schedule(
         learner_id=learner_id,
         item_type=ITEM_TYPE_TASK_ITEM,
         item_id=task_item_id,
-        response_rating=response_rating,
+        attempt_quality=attempt_quality,
     )
 
 
@@ -95,7 +95,7 @@ def upsert_lexis_review_schedule(
     session: Session,
     learner_id: str,
     item_id: str,
-    response_rating: int,
+    attempt_quality: int,
 ) -> LearnerItem:
     """Upsert FSRS state for a lexis item (item_type=lexis)."""
     return _upsert(
@@ -103,7 +103,7 @@ def upsert_lexis_review_schedule(
         learner_id=learner_id,
         item_type=ITEM_TYPE_LEXIS,
         item_id=item_id,
-        response_rating=response_rating,
+        attempt_quality=attempt_quality,
     )
 
 
@@ -113,7 +113,7 @@ def _upsert(
     learner_id: str,
     item_type: str,
     item_id: str,
-    response_rating: int,
+    attempt_quality: int,
 ) -> LearnerItem:
     row = session.exec(
         select(LearnerItem).where(
@@ -122,36 +122,44 @@ def _upsert(
             LearnerItem.item_id == item_id,
         )
     ).first()
-    w_vector_json: str | None = None
+    model_weights_json: str | None = None
     config = session.exec(
         select(FsrsConfig).where(FsrsConfig.learner_id == learner_id)
     ).first()
     if config:
-        w_vector_json = config.w_vector
+        model_weights_json = config.w_vector
     if row is None:
-        fsrs_state = initialise_item()
-        fsrs_state, due_date, stability, difficulty, retrievability = (
-            schedule_item(fsrs_state, response_rating, w_vector_json)
-        )
+        fsrs_state = initialise_item_state()
+        (
+            fsrs_state,
+            due_date,
+            memory_stability,
+            item_difficulty,
+            retrievability,
+        ) = schedule_review(fsrs_state, attempt_quality, model_weights_json)
         row = LearnerItem(
             learner_id=learner_id,
             item_type=item_type,
             item_id=item_id,
             fsrs_state=fsrs_state,
-            stability=stability,
-            difficulty=difficulty,
+            stability=memory_stability,
+            difficulty=item_difficulty,
             due_date=due_date,
             retrievability=retrievability,
         )
         session.add(row)
     else:
-        fsrs_state = row.fsrs_state or initialise_item()
-        fsrs_state, due_date, stability, difficulty, retrievability = (
-            schedule_item(fsrs_state, response_rating, w_vector_json)
-        )
+        fsrs_state = row.fsrs_state or initialise_item_state()
+        (
+            fsrs_state,
+            due_date,
+            memory_stability,
+            item_difficulty,
+            retrievability,
+        ) = schedule_review(fsrs_state, attempt_quality, model_weights_json)
         row.fsrs_state = fsrs_state
-        row.stability = stability
-        row.difficulty = difficulty
+        row.stability = memory_stability
+        row.difficulty = item_difficulty
         row.due_date = due_date
         row.retrievability = retrievability
         session.add(row)

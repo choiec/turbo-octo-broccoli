@@ -62,6 +62,7 @@ def test_list_grammar_by_cefr() -> None:
                     "can use",
                     "He works.",
                     "",
+                    "b1",
                 ]
             ]
         )
@@ -72,6 +73,7 @@ def test_list_grammar_by_cefr() -> None:
     assert data[0]["guideword"] == "present simple"
     assert data[0]["can_do"] == "can use"
     assert data[0]["example"] == "He works."
+    assert data[0]["cefr_level"] == "b1"
 
 
 def test_list_lexis_by_cefr() -> None:
@@ -170,7 +172,7 @@ def test_lexis_review_schedule_post_ok() -> None:
     payload = {
         "learner_id": "u1",
         "item_id": "lex-item-1",
-        "response_rating": 3,
+        "attempt_quality": 3,
     }
     mock_row = SimpleNamespace(
         id=1,

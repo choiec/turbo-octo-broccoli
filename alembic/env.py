@@ -23,6 +23,12 @@ from app.models.english.exam_period import (  # noqa: F401
     LearnerExamOverride,
 )
 from app.models.english.fsrs_config import FsrsConfig  # noqa: F401
+from app.models.english.grammar_set import (  # noqa: F401
+    GrammarSet,
+    GrammarSetItem,
+    LexisSet,
+    LexisSetItem,
+)
 from app.models.english.learner_item import LearnerItem  # noqa: F401
 from app.models.english.learner_proficiency import (
     LearnerProficiency,  # noqa: F401

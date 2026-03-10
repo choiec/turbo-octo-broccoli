@@ -19,9 +19,9 @@ def _to_read(row: LearnerItem) -> ReviewScheduleRead:
         id=row.id,  # type: ignore[arg-type]
         learner_id=row.learner_id,
         task_item_id=row.item_id,
-        card_state=row.fsrs_state,
-        stability=row.stability,
-        difficulty=row.difficulty,
+        item_state=row.fsrs_state,
+        memory_stability=row.stability,
+        item_difficulty=row.difficulty,
         due_date=row.due_date,
         retrievability=row.retrievability,
     )
@@ -30,7 +30,7 @@ def _to_read(row: LearnerItem) -> ReviewScheduleRead:
 class ReviewScheduleUpsertBody(SQLModel):
     learner_id: str
     task_item_id: str
-    response_rating: int  # 1=Again, 2=Hard, 3=Good, 4=Easy
+    attempt_quality: int  # 1=Again, 2=Hard, 3=Good, 4=Easy
 
 
 @router.get("/due/{learner_id}", response_model=list[ReviewScheduleRead])
@@ -64,6 +64,6 @@ def upsert_review_schedule(
         session,
         body.learner_id,
         body.task_item_id,
-        body.response_rating,
+        body.attempt_quality,
     )
     return _to_read(row)

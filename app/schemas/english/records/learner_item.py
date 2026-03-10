@@ -11,9 +11,9 @@ class ReviewScheduleRead(SQLModel):
     id: int
     learner_id: str
     task_item_id: str
-    card_state: str | None
-    stability: float
-    difficulty: float
+    item_state: str | None
+    memory_stability: float
+    item_difficulty: float
     due_date: datetime
     retrievability: float | None
 
@@ -24,8 +24,8 @@ class LexisReviewScheduleRead(SQLModel):
     id: int
     learner_id: str
     item_id: str
-    card_state: str | None
-    stability: float
-    difficulty: float
+    item_state: str | None
+    memory_stability: float
+    item_difficulty: float
     due_date: datetime
     retrievability: float | None

@@ -1,4 +1,4 @@
-"""Init GrammaticalSet and GrammarProfile (FalkorDB) from grammar JSON files."""
+"""Init GrammarSet (SQLite) and GrammarProfile (FalkorDB) from grammar JSON."""
 
 from __future__ import annotations
 
@@ -62,12 +62,12 @@ def _iter_grammar_profiles(items: list) -> list[tuple[dict, int]]:
 def init_from_json(
     path: Path,
     graph,
+    session,
     *,
     dry_run: bool = False,
 ) -> tuple[int, int]:
-    """Load one grammar-*.json; upsert GrammarProfile and GrammaticalSet.
-    Returns (sets, items)."""
-    from app.crud.english.inventory import grammar, grammatical_set
+    """Load one grammar-*.json; upsert profile and set. Returns (sets, items)."""
+    from app.crud.english.inventory import grammar, grammar_set
 
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
@@ -97,19 +97,21 @@ def init_from_json(
                 sub_category=(raw.get("sub_category") or "").strip() or None,
                 can_do=(raw.get("can_do") or "").strip() or None,
             )
-            grammatical_set.upsert_grammatical_set(
-                graph,
+            grammar_set.upsert_grammar_set(
+                session,
                 set_id=set_id,
                 source=source,
                 unit_num=unit_num,
                 title=_unit_title(source, unit_num),
             )
-            grammatical_set.link_grammar(
-                graph, set_id=set_id, guideword=guideword
+            grammar_set.link_grammar(
+                session, set_id=set_id, guideword=guideword
             )
 
         item_count += 1
 
+    if not dry_run and item_count:
+        session.commit()
     return len(set_ids_seen), item_count
 
 
@@ -117,7 +119,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Init GrammaticalSet and GrammarProfile from JSON"
+        description="Init GrammarSet and GrammarProfile from JSON"
     )
     parser.add_argument(
         "--input-dir",
@@ -128,7 +130,7 @@ def main() -> int:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Only discover files and count, do not write to graph",
+        help="Only discover files and count, do not write",
     )
     args = parser.parse_args()
 
@@ -153,6 +155,7 @@ def main() -> int:
 
     try:
         from app.core.falkordb import get_graph_conn
+        from app.core.sqlite import get_session
     except ImportError:
         print(
             "Run from repo root and ensure app is on PYTHONPATH.",
@@ -161,14 +164,15 @@ def main() -> int:
         return 1
 
     graph = next(get_graph_conn())
+    session = next(get_session())
     total_sets = 0
     total_items = 0
     for path in json_paths:
-        n_sets, n_items = init_from_json(path, graph, dry_run=False)
+        n_sets, n_items = init_from_json(path, graph, session, dry_run=False)
         total_sets += n_sets
         total_items += n_items
         print(f"{path.name}: {n_items} items, {n_sets} sets")
-    print(f"Done: {total_sets} grammatical sets, {total_items} grammar links")
+    print(f"Done: {total_sets} grammar sets, {total_items} grammar links")
     return 0
 
 

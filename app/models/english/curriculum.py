@@ -28,6 +28,6 @@ class CurriculumSessionUnit(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("session_id", "set_id"),)
     id: int | None = Field(default=None, primary_key=True)
     session_id: int = Field(foreign_key="curriculum_session.id", index=True)
-    set_id: str = Field(index=True)  # GrammaticalSet.set_id (FalkorDB)
+    set_id: str = Field(index=True)  # grammar_set.set_id (SQLite)
 
     session: CurriculumSession | None = Relationship(back_populates="units")

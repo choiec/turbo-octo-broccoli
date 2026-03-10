@@ -117,37 +117,40 @@ def upload_grammar(
 def upload_lexis_item(
     files: list[UploadFile] = File(...),
     graph: falkordb.Graph = Depends(get_graph_conn),
+    session: Session = Depends(get_session),
 ):
-    """Upload lexis-*.json to load LexisItem (FalkorDB)."""
-    return _upload_lexis_json(files, graph, "lexis.json")
+    """Upload lexis-*.json: LexisItem (FalkorDB) and LexisSet (SQLite)."""
+    return _upload_lexis_json(files, graph, session, "lexis.json")
 
 
-@router.post("/lexical-set")
-def upload_lexical_set(
+@router.post("/lexis-set")
+def upload_lexis_set(
     files: list[UploadFile] = File(...),
     graph: falkordb.Graph = Depends(get_graph_conn),
+    session: Session = Depends(get_session),
 ):
-    """Upload lexis-*.json to load LexicalSet (FalkorDB). Same file format as lexis-item."""
-    return _upload_lexis_json(files, graph, "lexis.json")
+    """Upload lexis-*.json: LexisSet and LexisItem. Same format as lexis-item."""
+    return _upload_lexis_json(files, graph, session, "lexis.json")
 
 
 def _upload_lexis_json(
     files: list[UploadFile],
     graph: falkordb.Graph,
+    session: Session,
     default_filename: str,
 ) -> dict | JSONResponse:
-    """Shared handler: load LexicalSet and LexisItem from lexis-*.json."""
+    """Load LexisSet (SQLite) and LexisItem (FalkorDB) from lexis-*.json."""
     results: list[dict] = []
     for upload in files:
         path = _save_upload_to_temp(upload)
         try:
             n_lists, n_items = init_lexis_item_from_json(
-                path, graph, dry_run=False
+                path, graph, session, dry_run=False
             )
             results.append(
                 {
                     "filename": upload.filename or default_filename,
-                    "lexical_sets": n_lists,
+                    "lexis_sets": n_lists,
                     "lexis_items": n_items,
                 }
             )
@@ -166,19 +169,20 @@ def _upload_lexis_json(
 def upload_grammar_unit(
     files: list[UploadFile] = File(...),
     graph: falkordb.Graph = Depends(get_graph_conn),
+    session: Session = Depends(get_session),
 ):
-    """Upload grammar-*.json to load GrammaticalSet and GrammarProfile."""
+    """Upload grammar-*.json: GrammarSet and GrammarProfile."""
     results: list[dict] = []
     for upload in files:
         path = _save_upload_to_temp(upload)
         try:
             n_sets, n_items = init_grammar_unit_from_json(
-                path, graph, dry_run=False
+                path, graph, session, dry_run=False
             )
             results.append(
                 {
                     "filename": upload.filename or "grammar.json",
-                    "grammatical_sets": n_sets,
+                    "grammar_sets": n_sets,
                     "grammar_links": n_items,
                 }
             )
@@ -226,7 +230,7 @@ def _enqueue_tagging(
     graph: falkordb.Graph,
     tagged_list: list[tuple[str, str]],
 ) -> str:
-    """Schedule grammar and lexis tag_tasks as background jobs; return status."""
+    """Schedule grammar and lexis tag_tasks as background jobs."""
     if not tagged_list:
         return "skipped"
     if settings.openai_api_key:
@@ -248,9 +252,9 @@ def upload_chunk(
     graph: falkordb.Graph = Depends(get_graph_conn),
     session: Session = Depends(get_session),
 ):
-    """Upload chunk JSON (source, id, article, questions[]) to load Source and Task.
+    """Upload chunk JSON to load Source and Task.
 
-    Grammar tagging runs as a background task after the response is returned.
+    Grammar tagging runs as a background task after the response.
     """
     results: list[dict] = []
     for upload in files:

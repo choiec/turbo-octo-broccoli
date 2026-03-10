@@ -1,4 +1,4 @@
-"""LexisItem graph: definition-level items linked to LexicalSet and CefrLevel."""
+"""LexisItem graph: items linked to CefrLevel, LexisProfile."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 
 class LexisItemSchema(BaseModel):
-    """Response schema for a single lexical-set lexis item."""
+    """Response schema for a single lexis set item."""
 
     item_id: str
     headword: str
@@ -16,10 +16,25 @@ class LexisItemSchema(BaseModel):
     cefr: str | None = None
 
 
-_LIST_BY_LEXICAL_SET_QUERY = (
-    "MATCH (s:LexicalSet {set_id: $set_id})-[:CONTAINS]->(i:LexisItem) "
+class LexisItemWithProfile(LexisItemSchema):
+    """LexisItem with optional LexisProfile (total_freq, total_nb_doc)."""
+
+    total_freq: float | None = None
+    total_nb_doc: int | None = None
+
+
+_LIST_BY_ITEM_IDS_QUERY = (
+    "MATCH (i:LexisItem) WHERE i.item_id IN $item_ids "
     "OPTIONAL MATCH (i)-[:LEXIS_LEVEL]->(c:CefrLevel) "
     "RETURN i.item_id, i.headword, i.pos, i.definition, c.code"
+)
+
+_LIST_BY_ITEM_IDS_WITH_PROFILE_QUERY = (
+    "MATCH (i:LexisItem) WHERE i.item_id IN $item_ids "
+    "OPTIONAL MATCH (i)-[:LEXIS_LEVEL]->(c:CefrLevel) "
+    "OPTIONAL MATCH (i)-[:HAS_PROFILE]->(l:LexisProfile) "
+    "RETURN i.item_id, i.headword, i.pos, i.definition, c.code, "
+    "l.total_freq, l.total_nb_doc"
 )
 
 
@@ -65,11 +80,30 @@ def link_cefr(
     graph.query(q, params={"item_id": item_id, "cefr": cefr.lower()})
 
 
-def list_by_lexical_set(
-    graph: falkordb.Graph, set_id: str
+def link_profile(
+    graph: falkordb.Graph,
+    *,
+    item_id: str,
+    headword: str,
+) -> None:
+    """Link LexisItem to LexisProfile (HAS_PROFILE).
+    Idempotent; no-op if profile absent.
+    """
+    q = (
+        "MATCH (i:LexisItem {item_id: $item_id}), "
+        "(l:LexisProfile {headword: $headword}) "
+        "MERGE (i)-[:HAS_PROFILE]->(l)"
+    )
+    graph.query(q, params={"item_id": item_id, "headword": headword})
+
+
+def list_by_item_ids(
+    graph: falkordb.Graph, item_ids: list[str]
 ) -> list[LexisItemSchema]:
-    """Return LexisItems in the given LexicalSet with optional CEFR."""
-    result = graph.query(_LIST_BY_LEXICAL_SET_QUERY, params={"set_id": set_id})
+    """Return LexisItems for the given item_ids with optional CEFR."""
+    if not item_ids:
+        return []
+    result = graph.query(_LIST_BY_ITEM_IDS_QUERY, params={"item_ids": item_ids})
     return [
         LexisItemSchema(
             item_id=row[0],
@@ -77,6 +111,29 @@ def list_by_lexical_set(
             pos=row[2] or None,
             definition=row[3] or "",
             cefr=(row[4].lower() if row[4] else None),
+        )
+        for row in result.result_set
+    ]
+
+
+def list_by_item_ids_with_profile(
+    graph: falkordb.Graph, item_ids: list[str]
+) -> list[LexisItemWithProfile]:
+    """Return LexisItems for item_ids with optional CEFR and LexisProfile."""
+    if not item_ids:
+        return []
+    result = graph.query(
+        _LIST_BY_ITEM_IDS_WITH_PROFILE_QUERY, params={"item_ids": item_ids}
+    )
+    return [
+        LexisItemWithProfile(
+            item_id=row[0],
+            headword=row[1] or "",
+            pos=row[2] or None,
+            definition=row[3] or "",
+            cefr=(row[4].lower() if row[4] else None),
+            total_freq=(float(row[5]) if row[5] is not None else None),
+            total_nb_doc=(int(row[6]) if row[6] is not None else None),
         )
         for row in result.result_set
     ]

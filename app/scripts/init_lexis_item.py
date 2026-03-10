@@ -1,4 +1,4 @@
-"""Init LexisItem and LexicalSet (FalkorDB) from lexis JSON files."""
+"""Init LexisSet (SQLite) and LexisItem (FalkorDB) from lexis JSON files."""
 
 from __future__ import annotations
 
@@ -21,11 +21,12 @@ def _book_slug(path: Path) -> str:
 def init_from_json(
     path: Path,
     graph,
+    session,
     *,
     dry_run: bool = False,
 ) -> tuple[int, int]:
-    """Load one JSON; upsert LexicalSet and LexisItem. Returns (sets, items)."""
-    from app.crud.english.inventory import lexical_set, lexis, lexis_item
+    """Load one JSON; upsert LexisSet and LexisItem. Returns (sets, items)."""
+    from app.crud.english.inventory import lexis, lexis_item, lexis_set
 
     with open(path, encoding="utf-8") as f:
         items = json.load(f)
@@ -57,20 +58,23 @@ def init_from_json(
                 pos=pos,
                 definition=definition,
             )
+            lexis_item.link_profile(graph, item_id=item_id, headword=headword)
             cefr = lexis.get_dominant_cefr(graph, headword)
             if cefr:
                 lexis_item.link_cefr(graph, item_id=item_id, cefr=cefr)
 
-            lexical_set.upsert_lexical_set(
-                graph,
+            lexis_set.upsert_lexis_set(
+                session,
                 set_id=set_id,
                 source=source,
                 unit_num=unit_num,
             )
-            lexical_set.link_item(graph, set_id=set_id, item_id=item_id)
+            lexis_set.link_item(session, set_id=set_id, item_id=item_id)
 
         item_count += 1
 
+    if not dry_run and item_count:
+        session.commit()
     return len(set_ids_seen), item_count
 
 
@@ -78,7 +82,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Init LexicalSet and LexisItem (FalkorDB) from JSON"
+        description="Init LexisSet (SQLite) and LexisItem (FalkorDB) from JSON"
     )
     parser.add_argument(
         "--input-dir",
@@ -89,7 +93,7 @@ def main() -> int:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Only discover files and count, do not write to graph",
+        help="Only discover files and count, do not write",
     )
     args = parser.parse_args()
 
@@ -114,6 +118,7 @@ def main() -> int:
 
     try:
         from app.core.falkordb import get_graph_conn
+        from app.core.sqlite import get_session
     except ImportError:
         print(
             "Run from repo root and ensure app is on PYTHONPATH.",
@@ -122,12 +127,13 @@ def main() -> int:
         return 1
 
     graph = next(get_graph_conn())
+    session = next(get_session())
     total_lists = 0
     total_items = 0
     for path in json_paths:
-        n_lists, n_items = init_from_json(path, graph, dry_run=False)
+        n_lists, n_items = init_from_json(path, graph, session, dry_run=False)
         total_lists += n_lists
         total_items += n_items
         print(f"{path.name}: {n_items} items, {n_lists} lists")
-    print(f"Done: {total_lists} lexical sets, {total_items} lexis items")
+    print(f"Done: {total_lists} lexis sets, {total_items} lexis items")
     return 0
